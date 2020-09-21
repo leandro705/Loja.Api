@@ -33,6 +33,8 @@ namespace Loja.Repository.Migrations
                     ConcurrencyStamp = table.Column<string>(nullable: true),
                     Nome = table.Column<string>(type: "varchar(150)", nullable: false),
                     DataCadastro = table.Column<DateTime>(nullable: false),
+                    IsGoogle = table.Column<bool>(nullable: false),
+                    IsFacebook = table.Column<bool>(nullable: false),
                     Email = table.Column<string>(type: "varchar(150)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>

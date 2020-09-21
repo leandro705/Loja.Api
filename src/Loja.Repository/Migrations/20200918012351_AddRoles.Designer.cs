@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Loja.Repository.Migrations
 {
     [DbContext(typeof(LojaDbContext))]
-    [Migration("20200910214541_AddRoles")]
+    [Migration("20200918012351_AddRoles")]
     partial class AddRoles
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,6 +37,12 @@ namespace Loja.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(150)")
                         .HasMaxLength(256);
+
+                    b.Property<bool>("IsFacebook")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsGoogle")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Nome")
                         .IsRequired()

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Loja.Application.Templates;
+using Loja.Application.Validators;
 using Loja.CrossCutting.Dto;
 using Loja.Domain.Entities;
 using Loja.Domain.Interfaces.Services;
@@ -34,237 +35,220 @@ namespace Loja.Application.Services
             _configuration = configuration;
             _mapper = mapper;
         }
-
-        public async Task<IEnumerable<UserDto>> GetAll()
-        {
-            var users = await _userManager.Users.ToListAsync();
-            var usersDto = _mapper.Map<IEnumerable<User>, IEnumerable<UserDto>>(users);           
-            return usersDto;
-        }
-
+       
         public async Task<UserDto> Login(AuthDto authDto)
         {
-            var success = await _signInManager.PasswordSignInAsync(authDto.Email, authDto.Password, false, false);
+            var success = await _signInManager.PasswordSignInAsync(authDto.Email, authDto.Senha, false, false);
 
             if (!success.Succeeded)
                 return null;
 
             var applicationUser = await GetUserByEmail(authDto.Email);
-            var roles = await GetUserRoles(authDto.Email);
+            var role = await GetUserRole(authDto.Email);
             var claims = await GetUserClaims(authDto.Email);
-
-            return new UserDto
+            
+            return await Task.FromResult(new UserDto
             {
                 Id = applicationUser.Id,
                 Nome = applicationUser.Nome,
                 Email = applicationUser.Email,
-                Roles = roles,
+                Role = role,
                 Claims = claims
-            };
+            });
         }
 
-        public async Task<UserDto> LoginSocial(string email)
+        public async Task<ResultDto<UserDto>> SalvarCliente(UserDto userDto)
         {
-            var applicationUser = await GetUserByEmail(email);
+            userDto.Role = "Cliente";
+            var result = await Salvar(userDto);
 
-            if (applicationUser == null)
-                return null;
-
-            var roles = await GetUserRoles(email);
-            var claims = await GetUserClaims(email);
-
-            return new UserDto
-            {
-                Id = applicationUser.Id,
-                Nome = applicationUser.Nome,
-                Email = applicationUser.Email,
-                Roles = roles,
-                Claims = claims
-            };
+            if(result.StatusCode == 200)
+                _emailService.Send(userDto.Email, "Confirmação de cadastro", EmailTemplate.ConfirmacaoCadastro(_configuration, userDto));
+            
+            return await Task.FromResult(result);
         }
 
-        public async Task<UserDto> Create(UserDto userDto)
+        public async Task<ResultDto<UserDto>> Salvar(UserDto userDto)
         {
+            var userDtoValidate = new UserDtoValidate(userDto);
+            if (!userDtoValidate.Validate())
+                return ResultDto<UserDto>.Validation(userDtoValidate.Mensagens);
+
+            var usuarioJaCadastrado = await _userManager.Users.FirstOrDefaultAsync(c => c.Email == userDto.Email);            
+
+            if (usuarioJaCadastrado != null && usuarioJaCadastrado.IsGoogle)
+                return ResultDto<UserDto>.Validation("Email já cadastrado via google!");
+            else if (usuarioJaCadastrado != null && usuarioJaCadastrado.IsFacebook)
+                return ResultDto<UserDto>.Validation("Email já cadastrado via facebook!");
+            else if(usuarioJaCadastrado != null)
+                return ResultDto<UserDto>.Validation("Email já cadastrado!");
+
             var user = new User
             {
                 UserName = userDto.Email,
                 Email = userDto.Email,
-                Nome = userDto.Nome
+                Nome = userDto.Nome,                
+                IsFacebook = userDto.IsFacebook,
+                IsGoogle = userDto.IsGoogle,
+                DataCadastro = DateTime.Now
             };
 
-            var result = await _userManager.CreateAsync(user, userDto.Password);
-
+            var result = await _userManager.CreateAsync(user, userDto.Senha);
             userDto.Id = user.Id;
 
-            if (result.Succeeded && userDto.Roles != null && userDto.Roles.Any())
-                await AddUserRoles(userDto);
+            if (result.Succeeded && !string.IsNullOrWhiteSpace(userDto.Role))
+                await AddUserRole(userDto);
 
-            return userDto;
+            return await Task.FromResult(ResultDto<UserDto>.Success(userDto));
         }
 
-        public async Task SendPasswordRecoveryEmail(string email)
+        //public async Task<UserDto> Update(UserDto userDto)
+        //{
+        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == userDto.Id);
+
+        //    user.Nome = userDto.Nome;
+
+        //    await _userManager.UpdateAsync(user);
+
+        //    if (!string.IsNullOrEmpty(userDto.Senha))
+        //    {
+        //        await _userManager.RemovePasswordAsync(user);
+        //        await _userManager.AddPasswordAsync(user, userDto.Senha);
+        //    }
+
+        //    await RemoveAndAddUserRoles(userDto);
+
+        //    return await Task.FromResult(userDto);
+        //}
+
+        //public async Task<UserDto> GetUserById(Guid id)
+        //{
+        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == id.ToString());
+
+        //    var userDto = _mapper.Map<User, UserDto>(user);
+
+        //    if (userDto != null)
+        //        userDto.Role = await GetUserRole(userDto.Email);
+
+        //    return await Task.FromResult(userDto);
+        //}
+
+        public async Task<ResultDto<bool>> EnviarEmailRecuperarSenha(string email)
         {
-            var user = await _userManager.Users?.SingleAsync(u => u.Email == email);
-            var token = await GenerateToken(user);
-            _emailService.Send(user.Email, "Alteração de senha", EmailTemplate.RecoverPassword(_configuration, user, token));
+            var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+                return ResultDto<bool>.Validation("Email não cadastrado no sistema!");
+            else if (user != null && user.IsGoogle)
+                return ResultDto<bool>.Validation("Email já cadastrado via google!");
+            else if (user != null && user.IsFacebook)
+                return ResultDto<bool>.Validation("Email já cadastrado via facebook!");            
+
+            var token = await GerarToken(user);
+            _emailService.Send(user.Email, "Alteração de senha", EmailTemplate.RecuperarSenha(_configuration, user, token));
+            return ResultDto<bool>.Success(true);
         }
 
-        private async Task<string> GenerateToken(User user)
-        {
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(token);
-            return Convert.ToBase64String(plainTextBytes);
-        }
-
-        public async Task<UserDto> Update(UserDto userDto)
-        {
-            var user = await _userManager.Users?.SingleAsync(u => u.Id == userDto.Id);
-
-            user.Nome = userDto.Nome;
-
-            await _userManager.UpdateAsync(user);
-
-            if (!string.IsNullOrEmpty(userDto.Password))
-            {
-                await _userManager.RemovePasswordAsync(user);
-                await _userManager.AddPasswordAsync(user, userDto.Password);
-            }
-
-            await RemoveAndAddUserRoles(userDto);
-
-            return userDto;
-        }
-
-        private async Task AddUserRoles(UserDto userDto)
-        {
-            var user = await _userManager.Users?.SingleAsync(u => u.Id == userDto.Id);
-
-            await _userManager.AddToRolesAsync(user, userDto.Roles);
-        }
-
-        public async Task<UserDto> GetUserById(Guid id)
-        {
-            var user = await _userManager.Users?.SingleAsync(u => u.Id == id.ToString());
-
-            var userDto = _mapper.Map<User, UserDto>(user);
-
-            if (userDto != null)
-                userDto.Roles = await GetUserRoles(userDto.Email);
-
-            return userDto;
-        }
-
-        public async Task<UserDto> GetUserByEmail(string email)
-        {
-            try
-            {
-                var user = await _userManager?.Users?.FirstOrDefaultAsync(c => c.Email == email);
-
-                var userDto = _mapper.Map<User, UserDto>(user);
-
-                if (userDto != null)
-                    userDto.Roles = await GetUserRoles(email);
-
-                return userDto;
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
-        public async Task<bool> VerifyUserExistent(string email)
-        {
-            return await _userManager.Users.AnyAsync(x => x.UserName == email);
-        }
-
-        public async Task<IList<string>> GetUserRoles(string email)
-        {
-            var user = await _userManager.Users?.FirstAsync(c => c.Email == email);
-
-            return await _userManager.GetRolesAsync(user);
-        }
-
-        public async Task<IList<Claim>> GetUserClaims(string email)
-        {
-            var user = await _userManager.Users?.SingleAsync(u => u.UserName == email);
-
-            var claims = await _userManager.GetClaimsAsync(user);
-
-            return claims;
-        }
-
-        public async Task RemoveAllUserRoles(string id)
-        {
-            var user = await _userManager.Users?.SingleAsync(u => u.Id == id);
-
-            var roles = await _userManager.GetRolesAsync(user);
-
-            await _userManager.RemoveFromRolesAsync(user, roles);
-        }
-
-        public async Task RemoveAndAddUserRoles(UserDto userDto)
-        {
-            await RemoveAllUserRoles(userDto.Id);
-
-            await AddUserRoles(userDto);
-        }
-
-        public async Task Delete(Guid id)
-        {
-            var user = await _userManager.Users?.SingleAsync(u => u.Id == id.ToString());
-
-            if (user != null)
-                await _userManager.DeleteAsync(user);
-        }
-
-        public async Task<bool> ConfirmEmail(string userId, string token)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            var result = await _userManager.ConfirmEmailAsync(user, token);
-
-            return result.Succeeded;
-        }
-
-        public async Task<bool> ResetPassword(ResetPassowordDto dto)
+        public async Task<ResultDto<bool>> RecuperarSenha(RecuperarSenhaDto dto)
         {
             var user = await _userManager.FindByIdAsync(dto.UserId);
 
             var base64EncodedBytes = System.Convert.FromBase64String(dto.Token);
             dto.Token = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-            var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NovaSenha);
 
-            return result.Succeeded;
+            if (!result.Succeeded)
+                return ResultDto<bool>.Validation("Erro ao alterar senha!");
+
+            return await Task.FromResult(ResultDto<bool>.Success(true));
         }
 
-        public async Task<UserDto> UpdateLoggedUserData(UserDto userDto)
+        private async Task<UserDto> GetUserByEmail(string email)
+        {            
+            var user = await _userManager?.Users?.FirstOrDefaultAsync(c => c.Email == email);
+
+            var userDto = _mapper.Map<User, UserDto>(user);
+
+            if (userDto != null)
+                userDto.Role = await GetUserRole(email);
+
+            return await Task.FromResult(userDto);           
+        }             
+
+        private async Task<string> GerarToken(User user)
         {
-            var user = await _userManager.Users?.SingleAsync(u => u.Id == userDto.Id);
-
-            user.Nome = userDto.Nome;
-            user.Email = userDto.Email;
-
-            await _userManager.UpdateAsync(user);
-
-            return userDto;
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(token);
+            return await Task.FromResult(Convert.ToBase64String(plainTextBytes));
         }
 
-        public async Task<UserDto> ObterDadosUsuarioLogado(Guid id)
+        private async Task AddUserRole(UserDto userDto)
         {
-            var user = await _userManager.Users?.SingleAsync(u => u.Id == id.ToString());
-
-            return _mapper.Map<User, UserDto>(user);
+            var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == userDto.Id);
+            await _userManager.AddToRoleAsync(user, userDto.Role);
         }
 
-        public async Task<bool> AtualizarSenha(UserDto userDto)
+        private async Task<string> GetUserRole(string email)
         {
-            var user = await _userManager.Users?.SingleAsync(u => u.Id == userDto.Id);
-
-            var result = await _userManager.ChangePasswordAsync(user, userDto.Password, userDto.NewPassword);
-
-            return result.Succeeded;
+            var user = await _userManager.Users?.FirstOrDefaultAsync(c => c.Email == email);
+            var roles = await _userManager.GetRolesAsync(user);
+            return await Task.FromResult(roles.FirstOrDefault());            
         }
+
+        private async Task<IList<Claim>> GetUserClaims(string email)
+        {
+            var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.UserName == email);
+            var claims = await _userManager.GetClaimsAsync(user);
+            return await Task.FromResult(claims);
+        }
+
+        //private async Task RemoveAllUserRoles(string id)
+        //{
+        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == id);
+        //    var roles = await _userManager.GetRolesAsync(user);
+        //    await _userManager.RemoveFromRolesAsync(user, roles);
+        //}
+
+        //private async Task RemoveAndAddUserRoles(UserDto userDto)
+        //{
+        //    await RemoveAllUserRoles(userDto.Id);
+        //    await AddUserRole(userDto);
+        //}
+
+        //public async Task Delete(Guid id)
+        //{
+        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == id.ToString());
+
+        //    if (user != null)
+        //        await _userManager.DeleteAsync(user);
+        //}         
+
+        //public async Task<UserDto> UpdateLoggedUserData(UserDto userDto)
+        //{
+        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == userDto.Id);
+
+        //    user.Nome = userDto.Nome;
+        //    user.Email = userDto.Email;
+
+        //    await _userManager.UpdateAsync(user);
+
+        //    return await Task.FromResult(userDto);
+        //}
+
+        //public async Task<UserDto> ObterDadosUsuarioLogado(Guid id)
+        //{
+        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == id.ToString());
+        //    return await Task.FromResult(_mapper.Map<User, UserDto>(user));
+        //}
+
+        //public async Task<bool> AtualizarSenha(UserDto userDto)
+        //{
+        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == userDto.Id);
+
+        //    var result = await _userManager.ChangePasswordAsync(user, userDto.Senha, userDto.NovaSenha);
+
+        //    return await Task.FromResult(result.Succeeded);
+        //}
 
         public async Task LogOff()
         {

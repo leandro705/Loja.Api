@@ -25,7 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Loja.Application\Loja.Application.csproj" />
     <ProjectReference Include="..\Loja.CrossCutting\Loja.CrossCutting.csproj" />
-    <ProjectReference Include="..\Loja.Repository\Loja.Repository.csproj" />
   </ItemGroup>
 
 

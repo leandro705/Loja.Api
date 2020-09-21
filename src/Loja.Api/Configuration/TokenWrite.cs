@@ -12,7 +12,7 @@ namespace Loja.Api.Configuration
 {
     public class TokenWrite
     {
-        public static object WriteToken(UserDto userDto, TokenConfigurations tokenConfigurations, SigningConfigurations signingConfigurations)
+        public static AuthenticatedDto WriteToken(UserDto userDto, TokenConfigurations tokenConfigurations, SigningConfigurations signingConfigurations)
         {
             DateTime dataCriacao = DateTime.Now;
             DateTime dataExpiracao = dataCriacao + TimeSpan.FromSeconds(tokenConfigurations.Seconds);
@@ -33,18 +33,18 @@ namespace Loja.Api.Configuration
 
             var token = handler.WriteToken(securityToken);
 
-            return new
+            return new AuthenticatedDto()
             {
-                id = userDto.Id,
-                userName = userDto.Nome,
-                email = userDto.Email,
-                authenticated = true,
-                created = dataCriacao.ToString("yyyy-MM-dd HH:mm:ss"),
-                expiration = dataExpiracao.ToString("yyyy-MM-dd HH:mm:ss"),
-                accessToken = token,
-                isGooogle = userDto.IsGoogle,
-                message = "OK",
-                role = userDto?.Roles?.FirstOrDefault()
+                Id = userDto.Id,
+                UserName = userDto.Nome,
+                Email = userDto.Email,
+                Authenticated = true,
+                Created = dataCriacao.ToString("yyyy-MM-dd HH:mm:ss"),
+                Expiration = dataExpiracao.ToString("yyyy-MM-dd HH:mm:ss"),
+                AccessToken = token,
+                Role = userDto?.Role,
+                IsGoogle = userDto.IsGoogle,
+                IsFacebook = userDto.IsFacebook   
             };
         }
 
@@ -55,15 +55,12 @@ namespace Loja.Api.Configuration
 
         private static List<Claim> PrepareClaims(UserDto userDto)
         {
-            var claims = new List<Claim>();
-
-            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Email, userDto.Email));
-
-            foreach (var item in userDto.Roles)
+            var claims = new List<Claim>
             {
-                claims.Add(new Claim(ClaimTypes.Role, item));
-            }
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
+                new Claim(JwtRegisteredClaimNames.Email, userDto.Email),
+                new Claim(ClaimTypes.Role, userDto.Role)
+            };
 
             return claims;
         }

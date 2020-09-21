@@ -36,6 +36,12 @@ namespace Loja.Repository.Migrations
                         .HasColumnType("varchar(150)")
                         .HasMaxLength(256);
 
+                    b.Property<bool>("IsFacebook")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsGoogle")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("varchar(150)");

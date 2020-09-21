@@ -5,23 +5,26 @@ using System.Linq;
 
 namespace Loja.Application.Validators
 {
-    public class AuthDtoValidate : IValidator
+    public class UserDtoValidate : IValidator
     {
-        private readonly AuthDto _authDto;
+        private readonly UserDto _userDto;
         public List<string> Mensagens { get; }
 
-        public AuthDtoValidate(AuthDto authDto)
+        public UserDtoValidate(UserDto userDto)
         {
-            _authDto = authDto;
+            _userDto = userDto;
             Mensagens = new List<string>();
         }
 
         public bool Validate()
         {
-            if (string.IsNullOrWhiteSpace(_authDto.Email))
+            if (string.IsNullOrWhiteSpace(_userDto.Nome))
+                Mensagens.Add("Informe o nome!");
+
+            if (string.IsNullOrWhiteSpace(_userDto.Email))
                 Mensagens.Add("Informe o e-mail!");
 
-            if (string.IsNullOrWhiteSpace(_authDto.Senha))
+            if (string.IsNullOrWhiteSpace(_userDto.Senha))
                 Mensagens.Add("Informe a senha!");
 
             return !Mensagens.Any();

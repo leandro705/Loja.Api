@@ -31,84 +31,102 @@ namespace Loja.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ResultDto<object>> Auth([FromBody] AuthDto authDto)
+        [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
+        public async Task<ResultDto<UserDto>> Post([FromBody] UserDto userDto)
+        {
+            return await _userService.SalvarCliente(userDto);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<ResultDto<AuthenticatedDto>> Auth([FromBody] AuthDto authDto)
         {
             var authDtoValidador = new AuthDtoValidate(authDto);
             if (!authDtoValidador.Validate())
-                return ResultDto<object>.Validation(authDtoValidador.Mensagens);
+                return ResultDto<AuthenticatedDto>.Validation(authDtoValidador.Mensagens);
 
             var userDto = await _userService.Login(authDto);
 
             if (userDto != null)
-                return ResultDto<object>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
+                return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
 
-            return ResultDto<object>.Validation("Login ou senha inválidos!");
-        }       
-
-        //[AllowAnonymous]
-        //[HttpPost("google")]
-        //public async Task<IActionResult> AuthGoogle([FromBody] AuthDto authDto)
-        //{
-        //    var payload = GoogleJsonWebSignature.ValidateAsync(authDto.Token, new GoogleJsonWebSignature.ValidationSettings()).Result;
-
-        //    if (!payload.EmailVerified)
-        //        return BadRequest(new List<string> { "Login inválido!" });
-
-        //    var userDto = await _userService.LoginSocial(payload.Email);
-
-        //    var isClientValid = false;
-
-        //    if (userDto != null && (userDto.Roles.Contains("ProgramaDeReciclagem") || userDto.Roles.Contains("PontoDeColeta")))
-        //    {
-        //        isClientValid = true;
-        //        userDto.IsGoogle = true;
-        //    }
-
-        //    if (userDto != null && isClientValid)
-        //        return Ok(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
-
-        //    return Unauthorized(new { authenticated = false, message = $"E-mail {authDto.Email} não cadastrado na plataforma!" });
-        //}
-
-        //[AllowAnonymous]
-        //[HttpPost("facebook")]
-        //public async Task<IActionResult> AuthFacebook([FromBody] AuthDto authDto)
-        //{
-        //    if (string.IsNullOrEmpty(authDto.Email))
-        //        return BadRequest(new List<string> { "Login inválido!" });
-
-        //    var userDto = await _userService.LoginSocial(authDto.Email);
-
-        //    var isClientValid = false;
-
-        //    if (userDto != null && (userDto.Roles.Contains("ProgramaDeReciclagem") || userDto.Roles.Contains("PontoDeColeta")))
-        //    {
-        //        isClientValid = true;
-        //        userDto.IsFacebook = true;
-        //    }
-
-        //    if (userDto != null && isClientValid)
-        //        return Ok(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
-
-        //    return Unauthorized(new { authenticated = false, message = "Login ou senha inválidos!" });
-        //}
+            return ResultDto<AuthenticatedDto>.Validation("Login ou senha inválidos!");
+        }      
 
         [AllowAnonymous]
-        [HttpGet("confirm-email")]
-        public async Task<bool> ConfirmEmail(string userId, string token)
+        [HttpPost("google")]
+        public async Task<ResultDto<AuthenticatedDto>> AuthGoogle([FromBody] AuthDto authDto)
         {
-            return await _userService.ConfirmEmail(userId, token);
+            var authDtoValidador = new AuthDtoValidate(authDto);
+            if (!authDtoValidador.Validate())
+                return ResultDto<AuthenticatedDto>.Validation("Autenticação google inválida!");
+
+            var userDto = await _userService.Login(authDto);
+
+            if (userDto == null)
+            {
+                var result = await _userService.SalvarCliente(new UserDto()
+                {
+                    Email = authDto.Email,
+                    Senha = authDto.Senha,
+                    Nome = authDto.Nome,
+                    IsGoogle = true
+                });
+
+                if (result.StatusCode != 200)
+                    return ResultDto<AuthenticatedDto>.Validation(result.Errors);
+
+                userDto = result.Data;
+            }
+            return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
         }
 
         [AllowAnonymous]
-        [HttpPost("reset-password")]
-        public async Task<bool> ResetPassword(ResetPassowordDto dto)
+        [HttpPost("facebook")]
+        public async Task<ResultDto<AuthenticatedDto>> AuthFacebook([FromBody] AuthDto authDto)
         {
-            return await _userService.ResetPassword(dto);
+            var authDtoValidador = new AuthDtoValidate(authDto);
+            if (!authDtoValidador.Validate())
+                return ResultDto<AuthenticatedDto>.Validation("Autenticação facebook inválida!");
+
+            var userDto = await _userService.Login(authDto);
+
+            if (userDto == null)
+            {
+                var result = await _userService.SalvarCliente(new UserDto()
+                {
+                    Email = authDto.Email,
+                    Senha = authDto.Senha,
+                    Nome = authDto.Nome,
+                    IsFacebook = true
+                });
+
+                if (result.StatusCode != 200)
+                    return ResultDto<AuthenticatedDto>.Validation(result.Errors);
+
+                userDto = result.Data;
+            }
+            return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
+        }
+      
+        [AllowAnonymous]
+        [HttpPost("recuperar-senha")]
+        public async Task<ResultDto<bool>> RecuperarSenha(RecuperarSenhaDto dto)
+        {
+            return await _userService.RecuperarSenha(dto);
         }
 
         [AllowAnonymous]
-        [HttpGet("log-off")]
+        [HttpPost]
+        [Route("enviar-email-recuperacao-senha")]
+        [ProducesResponseType(typeof(ResultDto<bool>), 200)]
+        public async Task<ResultDto<bool>> EnviarEmailDeRecuperacaoDeSenha([FromBody] UserDto userDto)
+        {
+            return await _userService.EnviarEmailRecuperarSenha(userDto.Email);           
+        }
+
+        [AllowAnonymous]
+        [HttpGet("logoff")]
         public async Task LogOff()
         {
             await _userService.LogOff();

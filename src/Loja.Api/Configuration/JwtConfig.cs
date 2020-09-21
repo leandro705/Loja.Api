@@ -27,15 +27,15 @@ namespace Loja.Api.Configuration
                 authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 authOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            //.AddGoogle(options =>
-            //{
-            //    options.ClientId = configuration["GoogleAuth:ClientId"];
-            //    options.ClientSecret = configuration["GoogleAuth:ClientSecret"];
-            //}).AddFacebook(x =>
-            //{
-            //    x.AppId = configuration["FacebookAuth:AppId"];
-            //    x.AppSecret = configuration["FacebookAuth:AppSecret"];
-            //})
+            .AddGoogle(options =>
+            {
+                options.ClientId = configuration["GoogleAuth:ClientId"];
+                options.ClientSecret = configuration["GoogleAuth:ClientSecret"];
+            }).AddFacebook(x =>
+            {
+                x.AppId = configuration["FacebookAuth:AppId"];
+                x.AppSecret = configuration["FacebookAuth:AppSecret"];
+            })
             .AddJwtBearer(x =>
             {
                 x.RequireHttpsMetadata = false;

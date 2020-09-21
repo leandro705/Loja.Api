@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Loja.Api.Controllers
 {
     [EnableCors("ApiCorsPolicy")]    
-    [Route("api/user")]
+    [Route("api/users")]
     public class UserController : Controller
     {
         private readonly UserService _userService;
@@ -19,15 +19,7 @@ namespace Loja.Api.Controllers
         public UserController(UserService userService)
         {
             _userService = userService;
-        }
-
-        //[Authorize(Roles = "Administrador")]
-        [HttpGet]
-        [ProducesResponseType(typeof(ResultDto<IEnumerable<UserDto>>), 200)]
-        public async Task<IEnumerable<UserDto>> Get()
-        {
-            return await _userService.GetAll();
-        }
+        }       
 
         //[Authorize(Roles = "Administrador")]
         //[HttpGet("{id}")]
@@ -39,24 +31,9 @@ namespace Loja.Api.Controllers
         //    return Ok(user);
         //}
        
-        //[HttpGet]
-        //[Route("verify-user-by-email")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<IActionResult> VerifyUserByEmail(string email)
-        //{
-        //    var exist = await _userService.VerifyUserExistent(email);
-
-        //    if (exist)
-        //        return Ok(new { exist = true, message = "O e-mail informado já esta em uso!" });
-
-        //    return NotFound(new { exist = false, message = "E-mail inexistente!" });
-        //}
-
-
         //[Authorize(Roles = "Administrador")]
         //[HttpPost]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
         //public async Task<IActionResult> Post([FromBody] UserDto userDto)
         //{
         //    if (!userDto.IsValid())
@@ -128,18 +105,6 @@ namespace Loja.Api.Controllers
         //    var updated = await _userService.AtualizarSenha(userDto);
 
         //    return Ok(new { updated = updated });
-        //}
-
-        //[AllowAnonymous]
-        //[HttpPost]
-        //[Route("enviar-email-recuperacao-senha")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //public async Task<IActionResult> EnviarEmailDeRecuperacaoDeSenha([FromBody] UserDto userDto)
-        //{
-        //    await _userService.SendPasswordRecoveryEmail(userDto.Email);
-
-        //    return Ok(new { updated = true });
-        //}
+        //}        
     }
 }

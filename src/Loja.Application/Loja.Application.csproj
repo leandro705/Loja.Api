@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Loja.CrossCutting\Loja.CrossCutting.csproj" />
     <ProjectReference Include="..\Loja.Domain\Loja.Domain.csproj" />
+    <ProjectReference Include="..\Loja.Repository\Loja.Repository.csproj" />
   </ItemGroup>
 
 </Project>
