@@ -17,6 +17,14 @@ namespace Loja.Repository.EntityConfig
             builder.Property(x => x.Email)
                 .HasColumnType("varchar(150)")
                 .IsRequired();
+
+            builder.Property(x => x.Telefone)
+               .HasColumnType("varchar(12)");
+
+            builder.Property(x => x.Celular)
+               .HasColumnType("varchar(12)");
+
+            builder.HasOne(x => x.Endereco);
         }
     }
 }

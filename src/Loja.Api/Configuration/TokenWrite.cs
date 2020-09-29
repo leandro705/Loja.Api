@@ -36,7 +36,7 @@ namespace Loja.Api.Configuration
             return new AuthenticatedDto()
             {
                 Id = userDto.Id,
-                UserName = userDto.Nome,
+                Nome = userDto.Nome,
                 Email = userDto.Email,
                 Authenticated = true,
                 Created = dataCriacao.ToString("yyyy-MM-dd HH:mm:ss"),

@@ -7,13 +7,21 @@ namespace Loja.Repository.Context
 {
     public class LojaDbContext : IdentityDbContext<User>
     {
+
+        public DbSet<Endereco> Enderecos { get; set; }
+        public DbSet<Municipio> Municipios { get; set; }
+        public DbSet<Estado> Estados { get; set; }
+
         public LojaDbContext(DbContextOptions<LojaDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new UserConfig());           
+            modelBuilder.ApplyConfiguration(new UserConfig());
+            modelBuilder.ApplyConfiguration(new EnderecoConfig());
+            modelBuilder.ApplyConfiguration(new MunicipioConfig());
+            modelBuilder.ApplyConfiguration(new EstadoConfig());
 
             IgnoreDefaultColumnsAspNetUsers(modelBuilder);
         }
@@ -22,15 +30,11 @@ namespace Loja.Repository.Context
         {
             modelBuilder.Entity<User>()
                 .Ignore(i => i.NormalizedEmail)
-                //.Ignore(i => i.NormalizedUserName)
-                //.Ignore(i => i.Email)
                 .Ignore(i => i.EmailConfirmed)
-                //.Ignore(i => i.SecurityStamp)
                 .Ignore(i => i.PhoneNumber)
                 .Ignore(i => i.PhoneNumberConfirmed)
                 .Ignore(i => i.TwoFactorEnabled)
                 .Ignore(i => i.LockoutEnabled)
-                //.Ignore(i => i.ConcurrencyStamp)
                 .Ignore(i => i.AccessFailedCount)
                 .Ignore(i => i.LockoutEnd);            
         }       

@@ -42,15 +42,8 @@ namespace Loja.Repository.Repositories
         } 
 
         public int SaveChanges()
-        {
-            try
-            {
-                return _context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+        {           
+            return _context.SaveChanges();           
         }
     }
 }

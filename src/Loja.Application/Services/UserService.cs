@@ -102,36 +102,37 @@ namespace Loja.Application.Services
             return await Task.FromResult(ResultDto<UserDto>.Success(userDto));
         }
 
-        //public async Task<UserDto> Update(UserDto userDto)
-        //{
-        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == userDto.Id);
+        public async Task<ResultDto<UserDto>> Update(UserDto userDto)
+        {
+            var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == userDto.Id);
 
-        //    user.Nome = userDto.Nome;
+            if (user == null)
+                return ResultDto<UserDto>.Validation("Usuário não encontrado na base de dados!");
 
-        //    await _userManager.UpdateAsync(user);
+            user.AtualizarUsuario(userDto);
 
-        //    if (!string.IsNullOrEmpty(userDto.Senha))
-        //    {
-        //        await _userManager.RemovePasswordAsync(user);
-        //        await _userManager.AddPasswordAsync(user, userDto.Senha);
-        //    }
+            await _userManager.UpdateAsync(user);
 
-        //    await RemoveAndAddUserRoles(userDto);
+            return await Task.FromResult(ResultDto<UserDto>.Success(userDto));
+        }
 
-        //    return await Task.FromResult(userDto);
-        //}
+        public async Task<ResultDto<UserDto>> GetUserById(string id)
+        {
+            var user = await _userManager.Users?
+                .Include(x => x.Endereco)
+                    .ThenInclude(x => x.Municipio)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
-        //public async Task<UserDto> GetUserById(Guid id)
-        //{
-        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == id.ToString());
+            if (user == null)
+                return ResultDto<UserDto>.Validation("Usuário não encontrado na base de dados!");
 
-        //    var userDto = _mapper.Map<User, UserDto>(user);
+            var userDto = _mapper.Map<User, UserDto>(user);
 
-        //    if (userDto != null)
-        //        userDto.Role = await GetUserRole(userDto.Email);
+            if (userDto != null)
+                userDto.Role = await GetUserRole(userDto.Email);
 
-        //    return await Task.FromResult(userDto);
-        //}
+            return await Task.FromResult(ResultDto<UserDto>.Success(userDto));
+        }
 
         public async Task<ResultDto<bool>> EnviarEmailRecuperarSenha(string email)
         {
@@ -161,6 +162,17 @@ namespace Loja.Application.Services
                 return ResultDto<bool>.Validation("Erro ao alterar senha!");
 
             return await Task.FromResult(ResultDto<bool>.Success(true));
+        }
+
+        public async Task<ResultDto<bool>> AtualizarSenha(UserDto userDto)
+        {
+            var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == userDto.Id);
+            if (user == null)
+                return ResultDto<bool>.Validation("Usuário não encontrado na base de dados!");
+
+            var result = await _userManager.ChangePasswordAsync(user, userDto.Senha, userDto.NovaSenha);
+
+            return await Task.FromResult(ResultDto<bool>.Success(result.Succeeded));
         }
 
         private async Task<UserDto> GetUserByEmail(string email)
@@ -201,54 +213,6 @@ namespace Loja.Application.Services
             var claims = await _userManager.GetClaimsAsync(user);
             return await Task.FromResult(claims);
         }
-
-        //private async Task RemoveAllUserRoles(string id)
-        //{
-        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == id);
-        //    var roles = await _userManager.GetRolesAsync(user);
-        //    await _userManager.RemoveFromRolesAsync(user, roles);
-        //}
-
-        //private async Task RemoveAndAddUserRoles(UserDto userDto)
-        //{
-        //    await RemoveAllUserRoles(userDto.Id);
-        //    await AddUserRole(userDto);
-        //}
-
-        //public async Task Delete(Guid id)
-        //{
-        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == id.ToString());
-
-        //    if (user != null)
-        //        await _userManager.DeleteAsync(user);
-        //}         
-
-        //public async Task<UserDto> UpdateLoggedUserData(UserDto userDto)
-        //{
-        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == userDto.Id);
-
-        //    user.Nome = userDto.Nome;
-        //    user.Email = userDto.Email;
-
-        //    await _userManager.UpdateAsync(user);
-
-        //    return await Task.FromResult(userDto);
-        //}
-
-        //public async Task<UserDto> ObterDadosUsuarioLogado(Guid id)
-        //{
-        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == id.ToString());
-        //    return await Task.FromResult(_mapper.Map<User, UserDto>(user));
-        //}
-
-        //public async Task<bool> AtualizarSenha(UserDto userDto)
-        //{
-        //    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == userDto.Id);
-
-        //    var result = await _userManager.ChangePasswordAsync(user, userDto.Senha, userDto.NovaSenha);
-
-        //    return await Task.FromResult(result.Succeeded);
-        //}
 
         public async Task LogOff()
         {
