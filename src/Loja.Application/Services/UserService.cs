@@ -218,10 +218,5 @@ namespace Loja.Application.Services
         {
             await _signInManager.SignOutAsync();
         }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
     }
 }

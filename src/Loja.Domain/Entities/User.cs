@@ -1,6 +1,7 @@
 ﻿using Loja.CrossCutting.Dto;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections.Generic;
 
 namespace Loja.Domain.Entities
 {
@@ -13,7 +14,9 @@ namespace Loja.Domain.Entities
         public DateTime DataCadastro { get; set; }
         public bool IsGoogle { get; set; }
         public bool IsFacebook { get; set; }
-        public Endereco Endereco { get; set; }
+        public int? EnderecoId { get; set; }
+        public virtual Endereco Endereco { get; set; }
+        public virtual IEnumerable<UserEstabelecimento> UserEstabelecimentos { get; set; }
 
         public void AtualizarUsuario(UserDto userDto)
         {

@@ -3,8 +3,7 @@ using Loja.CrossCutting.Dto;
 using Loja.Domain.Entities;
 using Loja.Domain.Interfaces.Repository;
 using Loja.Domain.Interfaces.Services;
-using Microsoft.EntityFrameworkCore.Internal;
-using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -23,7 +22,7 @@ namespace Loja.Application.Services
     
         public async Task<ResultDto<IEnumerable<EstadoDto>>> ObterTodos()
         {
-            var estados = _estadoRepository.GetAll();
+            var estados = await _estadoRepository.GetAll();
 
             if (!estados.Any())
                 return ResultDto<IEnumerable<EstadoDto>>.Validation("Estados não encontrado na base de dados!");
@@ -31,11 +30,6 @@ namespace Loja.Application.Services
             var estadoDto = _mapper.Map<IEnumerable<Estado>, IEnumerable<EstadoDto>>(estados);          
 
             return await Task.FromResult(ResultDto<IEnumerable<EstadoDto>>.Success(estadoDto));
-        }
-     
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
         }
     }
 }

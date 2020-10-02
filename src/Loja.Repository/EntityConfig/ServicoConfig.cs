@@ -4,20 +4,20 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Loja.Repository.EntityConfig
 {
-    public class EstadoConfig : IEntityTypeConfiguration<Estado>
+    public class ServicoConfig : IEntityTypeConfiguration<Servico>
     {
-        public void Configure(EntityTypeBuilder<Estado> builder)
+        public void Configure(EntityTypeBuilder<Servico> builder)
         {
-            builder.ToTable("Estado");
+            builder.ToTable("Servico");
 
-            builder.HasKey(x => x.EstadoId);
+            builder.HasKey(x => x.ServicoId);
 
             builder.Property(x => x.Nome)
                 .HasColumnType("varchar(150)")
                 .IsRequired();
 
-            builder.Property(x => x.Sigla)
-                .HasColumnType("varchar(2)")
+            builder.Property(x => x.Valor)
+                .HasColumnType("decimal(10,2)")
                 .IsRequired();
         }
     }

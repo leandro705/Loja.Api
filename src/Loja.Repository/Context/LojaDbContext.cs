@@ -8,20 +8,32 @@ namespace Loja.Repository.Context
     public class LojaDbContext : IdentityDbContext<User>
     {
 
+        public DbSet<Agendamento> Agendamentos { get; set; }
+        public DbSet<Atendimento> Atendimentos { get; set; }
         public DbSet<Endereco> Enderecos { get; set; }
-        public DbSet<Municipio> Municipios { get; set; }
+        public DbSet<Estabelecimento> Estabelecimentos { get; set; }
         public DbSet<Estado> Estados { get; set; }
+        public DbSet<Municipio> Municipios { get; set; }
+        public DbSet<Servico> Servicos { get; set; }        
+        
 
         public LojaDbContext(DbContextOptions<LojaDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.ApplyConfiguration(new UserConfig());
+            
+            modelBuilder.ApplyConfiguration(new AgendamentoConfig());
+            modelBuilder.ApplyConfiguration(new AtendimentoConfig());
+            modelBuilder.ApplyConfiguration(new AtendimentoItemConfig());
             modelBuilder.ApplyConfiguration(new EnderecoConfig());
-            modelBuilder.ApplyConfiguration(new MunicipioConfig());
+            modelBuilder.ApplyConfiguration(new EstabelecimentoConfig());
             modelBuilder.ApplyConfiguration(new EstadoConfig());
+            modelBuilder.ApplyConfiguration(new MunicipioConfig());            
+            modelBuilder.ApplyConfiguration(new ServicoConfig());
+            modelBuilder.ApplyConfiguration(new SituacaoConfig());            
+            modelBuilder.ApplyConfiguration(new UserConfig());
+            modelBuilder.ApplyConfiguration(new UserEstabelecimentoConfig());            
 
             IgnoreDefaultColumnsAspNetUsers(modelBuilder);
         }

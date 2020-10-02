@@ -10,6 +10,8 @@ namespace Loja.Repository.EntityConfig
         {
             builder.ToTable("Users");
 
+            builder.HasKey(x => x.Id);
+
             builder.Property(x => x.Nome)
                 .HasColumnType("varchar(150)")
                 .IsRequired();
@@ -18,13 +20,16 @@ namespace Loja.Repository.EntityConfig
                 .HasColumnType("varchar(150)")
                 .IsRequired();
 
+            builder.Property(x => x.DataCadastro)
+               .HasColumnType("datetime2");
+
             builder.Property(x => x.Telefone)
                .HasColumnType("varchar(12)");
 
             builder.Property(x => x.Celular)
                .HasColumnType("varchar(12)");
 
-            builder.HasOne(x => x.Endereco);
+            builder.HasOne(x => x.Endereco);            
         }
     }
 }

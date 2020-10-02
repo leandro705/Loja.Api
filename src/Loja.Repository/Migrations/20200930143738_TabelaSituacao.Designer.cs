@@ -4,14 +4,16 @@ using Loja.Repository.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Loja.Repository.Migrations
 {
     [DbContext(typeof(LojaDbContext))]
-    partial class LojaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200930143738_TabelaSituacao")]
+    partial class TabelaSituacao
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,7 +174,7 @@ namespace Loja.Repository.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Celular")
+                    b.Property<string>("Contato")
                         .IsRequired()
                         .HasColumnType("varchar(15)");
 
@@ -190,7 +192,7 @@ namespace Loja.Repository.Migrations
                     b.Property<string>("Facebook")
                         .HasColumnType("varchar(150)");
 
-                    b.Property<string>("Instagram")
+                    b.Property<string>("Instagran")
                         .HasColumnType("varchar(150)");
 
                     b.Property<string>("Nome")
@@ -199,9 +201,6 @@ namespace Loja.Repository.Migrations
 
                     b.Property<int>("SituacaoId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Telefone")
-                        .HasColumnType("varchar(15)");
 
                     b.HasKey("EstabelecimentoId");
 

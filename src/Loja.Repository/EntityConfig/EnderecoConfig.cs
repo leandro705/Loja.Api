@@ -10,6 +10,8 @@ namespace Loja.Repository.EntityConfig
         {
             builder.ToTable("Endereco");
 
+            builder.HasKey(x => x.EnderecoId);
+
             builder.Property(x => x.Logradouro)
                 .HasColumnType("varchar(150)")
                 .IsRequired();

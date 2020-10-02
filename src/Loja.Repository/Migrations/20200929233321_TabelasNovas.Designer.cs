@@ -4,14 +4,16 @@ using Loja.Repository.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Loja.Repository.Migrations
 {
     [DbContext(typeof(LojaDbContext))]
-    partial class LojaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200929233321_TabelasNovas")]
+    partial class TabelasNovas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,9 +31,6 @@ namespace Loja.Repository.Migrations
                     b.Property<DateTime>("DataAgendamento")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("DataFinalAgendamento")
                         .HasColumnType("datetime2");
 
@@ -44,7 +43,7 @@ namespace Loja.Repository.Migrations
                     b.Property<int>("ServicoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SituacaoId")
+                    b.Property<int>("Situacao")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -55,8 +54,6 @@ namespace Loja.Repository.Migrations
                     b.HasIndex("EstabelecimentoId");
 
                     b.HasIndex("ServicoId");
-
-                    b.HasIndex("SituacaoId");
 
                     b.HasIndex("UserId");
 
@@ -82,7 +79,7 @@ namespace Loja.Repository.Migrations
                     b.Property<string>("Observacao")
                         .HasColumnType("varchar(500)");
 
-                    b.Property<int>("SituacaoId")
+                    b.Property<int>("Situacao")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -97,8 +94,6 @@ namespace Loja.Repository.Migrations
                     b.HasKey("AtendimentoId");
 
                     b.HasIndex("EstabelecimentoId");
-
-                    b.HasIndex("SituacaoId");
 
                     b.HasIndex("UserId");
 
@@ -116,6 +111,9 @@ namespace Loja.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("ServicoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Situacao")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Valor")
@@ -172,12 +170,9 @@ namespace Loja.Repository.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Celular")
+                    b.Property<string>("Contato")
                         .IsRequired()
                         .HasColumnType("varchar(15)");
-
-                    b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Descricao")
                         .IsRequired()
@@ -190,22 +185,17 @@ namespace Loja.Repository.Migrations
                     b.Property<string>("Facebook")
                         .HasColumnType("varchar(150)");
 
-                    b.Property<string>("Instagram")
+                    b.Property<string>("Instagran")
                         .HasColumnType("varchar(150)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("varchar(150)");
 
-                    b.Property<int>("SituacaoId")
+                    b.Property<int>("Situacao")
                         .HasColumnType("int");
 
-                    b.Property<string>("Telefone")
-                        .HasColumnType("varchar(15)");
-
                     b.HasKey("EstabelecimentoId");
-
-                    b.HasIndex("SituacaoId");
 
                     b.ToTable("Estabelecimento");
                 });
@@ -270,22 +260,6 @@ namespace Loja.Repository.Migrations
                     b.HasKey("ServicoId");
 
                     b.ToTable("Servico");
-                });
-
-            modelBuilder.Entity("Loja.Domain.Entities.Situacao", b =>
-                {
-                    b.Property<int>("SituacaoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("varchar(150)");
-
-                    b.HasKey("SituacaoId");
-
-                    b.ToTable("Situacao");
                 });
 
             modelBuilder.Entity("Loja.Domain.Entities.User", b =>
@@ -510,12 +484,6 @@ namespace Loja.Repository.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Loja.Domain.Entities.Situacao", "Situacao")
-                        .WithMany()
-                        .HasForeignKey("SituacaoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Loja.Domain.Entities.User", "Usuario")
                         .WithMany()
                         .HasForeignKey("UserId");
@@ -526,12 +494,6 @@ namespace Loja.Repository.Migrations
                     b.HasOne("Loja.Domain.Entities.Estabelecimento", "Estabelecimento")
                         .WithMany()
                         .HasForeignKey("EstabelecimentoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Loja.Domain.Entities.Situacao", "Situacao")
-                        .WithMany()
-                        .HasForeignKey("SituacaoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -559,15 +521,6 @@ namespace Loja.Repository.Migrations
                         .WithMany()
                         .HasForeignKey("MunicipioId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Loja.Domain.Entities.Estabelecimento", b =>
-                {
-                    b.HasOne("Loja.Domain.Entities.Situacao", "Situacao")
-                        .WithMany()
-                        .HasForeignKey("SituacaoId")
-                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 

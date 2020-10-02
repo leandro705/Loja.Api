@@ -6,7 +6,7 @@
         public string Nome { get; set; }
         public string UF { get; set; }
         public int EstadoId { get; set; }
-        public Estado Estado { get; set; }
+        public virtual Estado Estado { get; set; }
 
     }
 }
