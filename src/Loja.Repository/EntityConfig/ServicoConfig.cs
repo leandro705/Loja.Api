@@ -19,6 +19,13 @@ namespace Loja.Repository.EntityConfig
             builder.Property(x => x.Valor)
                 .HasColumnType("decimal(10,2)")
                 .IsRequired();
+
+            builder.Property(x => x.DataCadastro)
+               .HasColumnType("datetime2");
+
+            builder.HasOne(x => x.Situacao)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

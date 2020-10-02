@@ -35,7 +35,10 @@ namespace Loja.Repository.EntityConfig
                 .HasColumnType("varchar(150)");
 
             builder.Property(x => x.Facebook)
-                .HasColumnType("varchar(150)");           
+                .HasColumnType("varchar(150)");
+
+            builder.Property(x => x.DataCadastro)
+               .HasColumnType("datetime2");
 
             builder.HasOne(x => x.Situacao)
                 .WithMany()

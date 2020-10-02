@@ -27,6 +27,34 @@ namespace Loja.Api.Controllers
         public async Task<ResultDto<IEnumerable<ServicoDto>>> Get()
         {
             return await _servicoService.ObterTodos();
-        } 
+        }       
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ResultDto<ServicoDto>), 200)]
+        public async Task<ResultDto<ServicoDto>> Get(int id)
+        {
+            return await _servicoService.ObterPorId(id);
+        }
+
+        [HttpPost("")]
+        [ProducesResponseType(typeof(ResultDto<ServicoDto>), 200)]
+        public async Task<ResultDto<ServicoDto>> Post([FromBody] ServicoDto servicoDto)
+        {
+            return await _servicoService.Create(servicoDto);
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ResultDto<bool>), 200)]
+        public async Task<ResultDto<bool>> Put(int id, [FromBody] ServicoDto servicoDto)
+        {
+            return await _servicoService.Update(servicoDto);
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(ResultDto<bool>), 200)]
+        public async Task<ResultDto<bool>> Delete(int id)
+        {
+            return await _servicoService.Delete(id);
+        }
     }
 }

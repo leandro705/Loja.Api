@@ -28,7 +28,9 @@ namespace Loja.Application.Mapper
                 .ForMember(d => d.DataCadastro, dto => dto.MapFrom(s => s.DataCadastro.ToString("dd/MM/yyyy HH:mm")));
             CreateMap<EstabelecimentoDto, Estabelecimento>();
 
-            CreateMap<Servico, ServicoDto>();
+            CreateMap<Servico, ServicoDto>()
+                .ForMember(d => d.Situacao, dto => dto.MapFrom(s => s.Situacao.Nome))
+                .ForMember(d => d.DataCadastro, dto => dto.MapFrom(s => s.DataCadastro.ToString("dd/MM/yyyy HH:mm")));
             CreateMap<ServicoDto, Servico>();
 
             CreateMap<Endereco, EnderecoDto>()
