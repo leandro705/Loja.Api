@@ -11,6 +11,7 @@ namespace Loja.Domain.Entities
         public string Nome { get; set; }
         public string Email { get; set; }
         public string Descricao { get; set; }
+        public string Url { get; set; }
         public string Telefone { get; set; }
         public string Celular { get; set; }
         public string Instagram { get; set; }
@@ -27,6 +28,7 @@ namespace Loja.Domain.Entities
             Nome = estabelecimentoDto.Nome;
             Email = estabelecimentoDto.Email;
             Descricao = estabelecimentoDto.Descricao;
+            Url = estabelecimentoDto.Url;
             Telefone = estabelecimentoDto.Telefone;
             Celular = estabelecimentoDto.Celular;
             Instagram = estabelecimentoDto.Instagram;

@@ -22,9 +22,9 @@ namespace Loja.Application.Services
             _mapper = mapper;
         }       
     
-        public async Task<ResultDto<IEnumerable<EstabelecimentoDto>>> ObterTodos()
+        public async Task<ResultDto<IEnumerable<EstabelecimentoDto>>> ObterTodos(string url)
         {
-            var estabelecimentos = await _estabelecimentoRepository.ObterTodos();
+            var estabelecimentos = await _estabelecimentoRepository.ObterTodos(url);
 
             if (!estabelecimentos.Any())
                 return await Task.FromResult(ResultDto<IEnumerable<EstabelecimentoDto>>.Validation("Estabelecimentos não encontrado na base de dados!"));

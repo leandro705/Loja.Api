@@ -24,9 +24,9 @@ namespace Loja.Api.Controllers
         
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<EstabelecimentoDto>>), 200)]
-        public async Task<ResultDto<IEnumerable<EstabelecimentoDto>>> Get()
+        public async Task<ResultDto<IEnumerable<EstabelecimentoDto>>> Get(string url)
         {
-            return await _estabelecimentoService.ObterTodos();
+            return await _estabelecimentoService.ObterTodos(url);
         }
 
         [HttpGet("{id}")]
@@ -34,7 +34,7 @@ namespace Loja.Api.Controllers
         public async Task<ResultDto<EstabelecimentoDto>> Get(int id)
         {
             return await _estabelecimentoService.ObterPorId(id);
-        }
+        }        
 
         [HttpPost("")]
         [ProducesResponseType(typeof(ResultDto<EstabelecimentoDto>), 200)]

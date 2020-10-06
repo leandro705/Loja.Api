@@ -15,9 +15,10 @@ namespace Loja.Repository.Repositories
         {
         }
 
-        public async Task<IEnumerable<Estabelecimento>> ObterTodos()
+        public async Task<IEnumerable<Estabelecimento>> ObterTodos(string url)
         {
             return await _context.Set<Estabelecimento>()
+                .Where(x =>  (string.IsNullOrEmpty(url) || x.Url == url))
                 .Where(x => x.SituacaoId == (int)ESituacao.ATIVO)
                 .Include(x => x.Situacao)
                 .ToListAsync();

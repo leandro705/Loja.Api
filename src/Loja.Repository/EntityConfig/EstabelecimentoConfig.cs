@@ -22,7 +22,11 @@ namespace Loja.Repository.EntityConfig
 
             builder.Property(x => x.Descricao)
                 .HasColumnType("varchar(500)")
-                .IsRequired();            
+                .IsRequired();
+
+            builder.Property(x => x.Url)
+                .HasColumnType("varchar(25)")
+                .IsRequired();
 
             builder.Property(x => x.Celular)
                .HasColumnType("varchar(15)")

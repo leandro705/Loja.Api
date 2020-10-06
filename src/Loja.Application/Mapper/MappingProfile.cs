@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Loja.CrossCutting.Dto;
 using Loja.Domain.Entities;
+using System.Globalization;
 
 namespace Loja.Application.Mapper
 {
@@ -30,7 +31,8 @@ namespace Loja.Application.Mapper
 
             CreateMap<Servico, ServicoDto>()
                 .ForMember(d => d.Situacao, dto => dto.MapFrom(s => s.Situacao.Nome))
-                .ForMember(d => d.DataCadastro, dto => dto.MapFrom(s => s.DataCadastro.ToString("dd/MM/yyyy HH:mm")));
+                .ForMember(d => d.DataCadastro, dto => dto.MapFrom(s => s.DataCadastro.ToString("dd/MM/yyyy HH:mm")))
+                .ForMember(d => d.ValorFormatado, dto => dto.MapFrom(s => s.Valor.ToString("N", CultureInfo.CurrentCulture)));
             CreateMap<ServicoDto, Servico>();
 
             CreateMap<Endereco, EnderecoDto>()

@@ -1,0 +1,13 @@
+version: '3.5'
+
+services:
+
+  api:   
+    image: loja.api
+    build: 
+      context: .
+    environment: 
+      - ASPNETCORE_ENVIRONMENT=Prodution   
+    ports:
+     - "80:80"    
+      
