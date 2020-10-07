@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Loja.Api.Configuration
+namespace Loja.Configuration
 {
     public static class CORSConfig
     {

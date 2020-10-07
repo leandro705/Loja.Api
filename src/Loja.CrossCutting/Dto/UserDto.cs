@@ -13,7 +13,10 @@ namespace Loja.CrossCutting.Dto
         public string Senha { get; set; }
         public string NovaSenha { get; set; }
         public string Role { get; set; }
-        public IEnumerable<Claim> Claims { get; set; }        
+        public int EstabelecimentoId { get; set; }
+        public string EstabelecimentoNomeUrl { get; set; }
+        public IEnumerable<Claim> Claims { get; set; }
+        public IEnumerable<int> Estabelecimentos { get; set; }
         public bool IsGoogle { get; set; }
         public bool IsFacebook { get; set; }
         public EnderecoDto Endereco { get; set; }

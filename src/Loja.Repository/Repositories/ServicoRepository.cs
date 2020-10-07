@@ -15,11 +15,13 @@ namespace Loja.Repository.Repositories
         {            
         }
 
-        public async Task<IEnumerable<Servico>> ObterTodos()
+        public async Task<IEnumerable<Servico>> ObterTodos(int? estabelecimentoId)
         {
             return await _context.Set<Servico>()
+                .Where(x => (!estabelecimentoId.HasValue || x.EstabelecimentoId == estabelecimentoId))
                 .Where(x => x.SituacaoId == (int)ESituacao.ATIVO)
                 .Include(x => x.Situacao)
+                .Include(x => x.Estabelecimento)
                 .ToListAsync();
         }
 

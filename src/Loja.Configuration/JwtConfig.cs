@@ -1,4 +1,5 @@
-﻿using Loja.Domain.Entities;
+﻿using Loja.Application;
+using Loja.Domain.Entities;
 using Loja.Repository.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 
-namespace Loja.Api.Configuration
+namespace Loja.Configuration
 {
     public static class JwtConfig
     {

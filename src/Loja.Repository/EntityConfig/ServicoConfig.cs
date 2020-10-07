@@ -20,10 +20,18 @@ namespace Loja.Repository.EntityConfig
                 .HasColumnType("decimal(10,2)")
                 .IsRequired();
 
+            builder.Property(x => x.Duracao)
+                .HasColumnType("int")
+                .IsRequired();
+
             builder.Property(x => x.DataCadastro)
                .HasColumnType("datetime2");
 
             builder.HasOne(x => x.Situacao)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(x => x.Estabelecimento)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
         }

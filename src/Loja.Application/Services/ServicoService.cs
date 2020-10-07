@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Loja.CrossCutting.Enumerators;
 using System;
+using Loja.Application.Validators;
 
 namespace Loja.Application.Services
 {
@@ -22,9 +23,9 @@ namespace Loja.Application.Services
             _mapper = mapper;
         }       
     
-        public async Task<ResultDto<IEnumerable<ServicoDto>>> ObterTodos()
+        public async Task<ResultDto<IEnumerable<ServicoDto>>> ObterTodos(int? estabelecimentoId)
         {
-            var servicos = await _servicoRepository.ObterTodos();
+            var servicos = await _servicoRepository.ObterTodos(estabelecimentoId);
 
             if (!servicos.Any())
                 return ResultDto<IEnumerable<ServicoDto>>.Validation("Serviços não encontrado na base de dados!");
@@ -48,6 +49,10 @@ namespace Loja.Application.Services
 
         public async Task<ResultDto<ServicoDto>> Create(ServicoDto servicoDto)
         {
+            var servicoDtoValidate = new ServicoDtoValidate(servicoDto);
+            if (!servicoDtoValidate.Validate())
+                return await Task.FromResult(ResultDto<ServicoDto>.Validation(servicoDtoValidate.Mensagens));
+
             var servico = _mapper.Map<Servico>(servicoDto);
             servico.SituacaoId = (int)ESituacao.ATIVO;
             servico.DataCadastro = DateTime.Now;
@@ -57,6 +62,10 @@ namespace Loja.Application.Services
 
         public async Task<ResultDto<bool>> Update(ServicoDto servicoDto)
         {
+            var servicoDtoValidate = new ServicoDtoValidate(servicoDto);
+            if (!servicoDtoValidate.Validate())
+                return await Task.FromResult(ResultDto<bool>.Validation(servicoDtoValidate.Mensagens));
+
             var servico = await _servicoRepository.ObterPorId(servicoDto.ServicoId);
             servico.AtualizarServico(servicoDto);
             await _servicoRepository.Update(servico);

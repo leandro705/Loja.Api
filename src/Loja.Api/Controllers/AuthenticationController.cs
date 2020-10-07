@@ -1,5 +1,4 @@
-﻿using Loja.Api.Configuration;
-using Loja.Application.Services;
+﻿using Loja.Application.Services;
 using Loja.Application.Validators;
 using Loja.CrossCutting.Dto;
 using Microsoft.AspNetCore.Authorization;
@@ -17,16 +16,11 @@ namespace Loja.Api.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly UserService _userService;
-        private readonly SigningConfigurations _signingConfigurations;
-        private readonly TokenConfigurations _tokenConfigurations;
+        private readonly UserService _userService;       
 
-        public AuthenticationController(UserService userService,
-            SigningConfigurations signingConfigurations, TokenConfigurations tokenConfigurations)
+        public AuthenticationController(UserService userService)
         {
-            _userService = userService;
-            _signingConfigurations = signingConfigurations;
-            _tokenConfigurations = tokenConfigurations;
+            _userService = userService;            
         }
 
         [AllowAnonymous]
@@ -45,13 +39,19 @@ namespace Loja.Api.Controllers
             if (!authDtoValidador.Validate())
                 return ResultDto<AuthenticatedDto>.Validation(authDtoValidador.Mensagens);
 
-            var userDto = await _userService.Login(authDto);
+            return await _userService.Login(authDto);           
+        }
 
-            if (userDto != null)
-                return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
+        [AllowAnonymous]
+        [HttpPost("loginAdmin")]
+        public async Task<ResultDto<AuthenticatedDto>> AuthAdmin([FromBody] AuthDto authDto)
+        {
+            var authDtoAdminValidador = new AuthDtoAdminValidate(authDto);
+            if (!authDtoAdminValidador.Validate())
+                return ResultDto<AuthenticatedDto>.Validation(authDtoAdminValidador.Mensagens);
 
-            return ResultDto<AuthenticatedDto>.Validation("Login ou senha inválidos!");
-        }      
+            return await _userService.LoginAdmin(authDto);            
+        }
 
         [AllowAnonymous]
         [HttpPost("google")]
@@ -61,24 +61,9 @@ namespace Loja.Api.Controllers
             if (!authDtoValidador.Validate())
                 return ResultDto<AuthenticatedDto>.Validation("Autenticação google inválida!");
 
-            var userDto = await _userService.Login(authDto);
-
-            if (userDto == null)
-            {
-                var result = await _userService.SalvarCliente(new UserDto()
-                {
-                    Email = authDto.Email,
-                    Senha = authDto.Senha,
-                    Nome = authDto.Nome,
-                    IsGoogle = true
-                });
-
-                if (result.StatusCode != 200)
-                    return ResultDto<AuthenticatedDto>.Validation(result.Errors);
-
-                userDto = result.Data;
-            }
-            return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
+            authDto.IsGoogle = true;
+            authDto.IsFacebook = false;
+            return await _userService.LoginSocial(authDto);
         }
 
         [AllowAnonymous]
@@ -89,24 +74,9 @@ namespace Loja.Api.Controllers
             if (!authDtoValidador.Validate())
                 return ResultDto<AuthenticatedDto>.Validation("Autenticação facebook inválida!");
 
-            var userDto = await _userService.Login(authDto);
-
-            if (userDto == null)
-            {
-                var result = await _userService.SalvarCliente(new UserDto()
-                {
-                    Email = authDto.Email,
-                    Senha = authDto.Senha,
-                    Nome = authDto.Nome,
-                    IsFacebook = true
-                });
-
-                if (result.StatusCode != 200)
-                    return ResultDto<AuthenticatedDto>.Validation(result.Errors);
-
-                userDto = result.Data;
-            }
-            return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
+            authDto.IsGoogle = false;
+            authDto.IsFacebook = true;
+            return await _userService.LoginSocial(authDto);            
         }
       
         [AllowAnonymous]
@@ -122,7 +92,7 @@ namespace Loja.Api.Controllers
         [ProducesResponseType(typeof(ResultDto<bool>), 200)]
         public async Task<ResultDto<bool>> EnviarEmailDeRecuperacaoDeSenha([FromBody] UserDto userDto)
         {
-            return await _userService.EnviarEmailRecuperarSenha(userDto.Email);           
+            return await _userService.EnviarEmailRecuperarSenha(userDto.Email, userDto.EstabelecimentoId);           
         }
 
         [AllowAnonymous]

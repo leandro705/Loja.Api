@@ -1,10 +1,9 @@
-﻿using System;
-
-namespace Loja.CrossCutting.Dto
+﻿namespace Loja.CrossCutting.Dto
 {
     public class AuthenticatedDto
     {
         public string Id { get; set; }
+        public int EstabelecimentoId { get; set; }
         public string Email { get; set; }        
         public string Nome { get; set; }
         public bool Authenticated { get; set; }
@@ -14,6 +13,7 @@ namespace Loja.CrossCutting.Dto
         public string Role { get; set; }
         public bool IsGoogle { get; set; }
         public bool IsFacebook { get; set; }
-
+        public bool IsAdministrador { get; set; }
+        
     }
 }

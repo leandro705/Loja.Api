@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace Loja.Api.Configuration
+namespace Loja.Configuration
 {
     public static class SwaggerConfig
     {
@@ -20,7 +20,7 @@ namespace Loja.Api.Configuration
                     Version = "v1",
                 });
 
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlFile = "Loja.Api.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });

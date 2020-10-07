@@ -8,6 +8,7 @@
         public string Token { get; set; }
         public bool IsGoogle { get; set; }
         public bool IsFacebook { get; set; }
+        public int EstabelecimentoId { get; set; }
 
     }
 }

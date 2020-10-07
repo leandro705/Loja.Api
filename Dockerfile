@@ -10,7 +10,7 @@ RUN dotnet publish "src/Loja.Api/Loja.Api.csproj" -c Release -o /app/publish
 
 ### Estágio 2 - Subir a aplicação através dos binários ###
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine
-ENV ASPNETCORE_ENVIRONMENT=Prodution \
+ENV ASPNETCORE_ENVIRONMENT=Production \
     LC_ALL=pt_BR.UTF-8 \
     LANG=pt_BR.UTF-8 \
     ASPNETCORE_URLS=http://*:80 \

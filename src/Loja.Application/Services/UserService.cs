@@ -18,43 +18,117 @@ namespace Loja.Application.Services
     public class UserService
     {
         private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;        
+        private readonly UserManager<User> _userManager;
+        private readonly SigningConfigurations _signingConfigurations;
+        private readonly TokenConfigurations _tokenConfigurations;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
+
         public UserService(SignInManager<User> signInManager,
                                    UserManager<User> userManager,
+                                   SigningConfigurations signingConfigurations, 
+                                   TokenConfigurations tokenConfigurations,
                                    IEmailService emailService,
                                    IConfiguration configuration,
                                    IMapper mapper)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _signingConfigurations = signingConfigurations;
+            _tokenConfigurations = tokenConfigurations;
             _emailService = emailService;
             _configuration = configuration;
             _mapper = mapper;
         }
        
-        public async Task<UserDto> Login(AuthDto authDto)
+        public async Task<ResultDto<AuthenticatedDto>> Login(AuthDto authDto)
         {
-            var success = await _signInManager.PasswordSignInAsync(authDto.Email, authDto.Senha, false, false);
+            var success = await _signInManager.PasswordSignInAsync(authDto.Email, authDto.Senha, false, false);            
 
-            if (!success.Succeeded)
-                return null;
-
+            if (!success.Succeeded)                           
+                return ResultDto<AuthenticatedDto>.Validation("Login ou senha inválidos!"); 
+           
             var applicationUser = await GetUserByEmail(authDto.Email);
-            var role = await GetUserRole(authDto.Email);
-            var claims = await GetUserClaims(authDto.Email);
-            
-            return await Task.FromResult(new UserDto
+
+            if(!applicationUser.Estabelecimentos.Contains(authDto.EstabelecimentoId))
+                return ResultDto<AuthenticatedDto>.Validation("Usuário não vinculado ao estabalecimento!");                       
+
+            var userDto = new UserDto
             {
                 Id = applicationUser.Id,
                 Nome = applicationUser.Nome,
                 Email = applicationUser.Email,
-                Role = role,
-                Claims = claims
-            });
+                Role = applicationUser.Role,
+                Claims = applicationUser.Claims,
+                EstabelecimentoId = authDto.EstabelecimentoId
+            };
+
+            return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
+        }
+        public async Task<ResultDto<AuthenticatedDto>> LoginAdmin(AuthDto authDto)
+        {
+            var success = await _signInManager.PasswordSignInAsync(authDto.Email, authDto.Senha, false, false);
+
+            if (!success.Succeeded)
+                return ResultDto<AuthenticatedDto>.Validation("Login ou senha inválidos!");
+
+            var applicationUser = await GetUserByEmail(authDto.Email);
+                       
+            var userDto = new UserDto
+            {
+                Id = applicationUser.Id,
+                Nome = applicationUser.Nome,
+                Email = applicationUser.Email,
+                Role = applicationUser.Role,
+                Claims = applicationUser.Claims
+            };
+
+            return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
+        }
+
+        public async Task<ResultDto<AuthenticatedDto>> LoginSocial(AuthDto authDto)
+        {
+            var success = await _signInManager.PasswordSignInAsync(authDto.Email, authDto.Senha, false, false);
+            UserDto userDto;
+
+            if (!success.Succeeded)
+            {
+                var result = await SalvarCliente(new UserDto()
+                {
+                    Email = authDto.Email,
+                    Senha = authDto.Senha,
+                    Nome = authDto.Nome,
+                    EstabelecimentoId = authDto.EstabelecimentoId,
+                    IsFacebook = authDto.IsFacebook,
+                    IsGoogle = authDto.IsGoogle
+                });
+
+                if (result.StatusCode != 200)
+                    return await Task.FromResult(ResultDto<AuthenticatedDto>.Validation(result.Errors));
+                
+                userDto = result.Data;
+            }
+            else
+            {
+                var applicationUser = await GetUserByEmail(authDto.Email);
+
+                if (!applicationUser.Estabelecimentos.Contains(authDto.EstabelecimentoId))
+                    return ResultDto<AuthenticatedDto>.Validation("Usuário não vinculado ao estabalecimento!");
+
+                userDto = new UserDto
+                {
+                    Id = applicationUser.Id,
+                    Nome = applicationUser.Nome,
+                    Email = applicationUser.Email,
+                    Role = applicationUser.Role,
+                    Claims = applicationUser.Claims,
+                    EstabelecimentoId = authDto.EstabelecimentoId
+                };
+            }
+
+            return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
         }
 
         public async Task<ResultDto<UserDto>> SalvarCliente(UserDto userDto)
@@ -63,7 +137,7 @@ namespace Loja.Application.Services
             var result = await Salvar(userDto);
 
             if(result.StatusCode == 200)
-                _emailService.Send(userDto.Email, "Confirmação de cadastro", EmailTemplate.ConfirmacaoCadastro(_configuration, userDto));
+                _emailService.Send(userDto.Email, "Confirmação de cadastro", EmailTemplate.ConfirmacaoCadastro(_configuration, result.Data));
             
             return await Task.FromResult(result);
         }
@@ -82,7 +156,7 @@ namespace Loja.Application.Services
                 return ResultDto<UserDto>.Validation("Email já cadastrado via facebook!");
             else if(usuarioJaCadastrado != null)
                 return ResultDto<UserDto>.Validation("Email já cadastrado!");
-
+            var userEstabelecimentos = new List<UserEstabelecimento> { new UserEstabelecimento() { EstabelecimentoId = userDto.EstabelecimentoId }};
             var user = new User
             {
                 UserName = userDto.Email,
@@ -90,14 +164,23 @@ namespace Loja.Application.Services
                 Nome = userDto.Nome,                
                 IsFacebook = userDto.IsFacebook,
                 IsGoogle = userDto.IsGoogle,
-                DataCadastro = DateTime.Now
-            };
+                DataCadastro = DateTime.Now,
+                UserEstabelecimentos = userEstabelecimentos
+            };           
 
             var result = await _userManager.CreateAsync(user, userDto.Senha);
             userDto.Id = user.Id;
 
             if (result.Succeeded && !string.IsNullOrWhiteSpace(userDto.Role))
-                await AddUserRole(userDto);
+            {
+                var userDB = await _userManager.Users
+                    .Include(x => x.UserEstabelecimentos)
+                    .ThenInclude(x => x.Estabelecimento)
+                    .FirstOrDefaultAsync(u => u.Id == userDto.Id);
+                
+                userDto.EstabelecimentoNomeUrl = userDB.UserEstabelecimentos.FirstOrDefault().Estabelecimento.Url;
+                await _userManager.AddToRoleAsync(userDB, userDto.Role);
+            }                
 
             return await Task.FromResult(ResultDto<UserDto>.Success(userDto));
         }
@@ -120,7 +203,7 @@ namespace Loja.Application.Services
         {
             var user = await _userManager.Users?
                 .Include(x => x.Endereco)
-                    .ThenInclude(x => x.Municipio)
+                    .ThenInclude(x => x.Municipio)                
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
@@ -129,24 +212,31 @@ namespace Loja.Application.Services
             var userDto = _mapper.Map<User, UserDto>(user);
 
             if (userDto != null)
-                userDto.Role = await GetUserRole(userDto.Email);
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userDto.Role = roles.FirstOrDefault();
+            }                
 
             return await Task.FromResult(ResultDto<UserDto>.Success(userDto));
         }
 
-        public async Task<ResultDto<bool>> EnviarEmailRecuperarSenha(string email)
+        public async Task<ResultDto<bool>> EnviarEmailRecuperarSenha(string email, int estabelecimentoId)
         {
-            var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Email == email);
-
+            var user = await _userManager.Users?
+                .Include(x => x.UserEstabelecimentos)
+                    .ThenInclude(x => x.Estabelecimento)
+                .FirstOrDefaultAsync(u => u.Email == email && u.UserEstabelecimentos.Any(x => x.EstabelecimentoId == estabelecimentoId));
+            
             if (user == null)
-                return ResultDto<bool>.Validation("Email não cadastrado no sistema!");
+                return ResultDto<bool>.Validation("Usuário não cadastrado no sistema!");
             else if (user != null && user.IsGoogle)
-                return ResultDto<bool>.Validation("Email já cadastrado via google!");
+                return ResultDto<bool>.Validation("Usuário já cadastrado via google!");
             else if (user != null && user.IsFacebook)
-                return ResultDto<bool>.Validation("Email já cadastrado via facebook!");            
+                return ResultDto<bool>.Validation("Usuário já cadastrado via facebook!");
 
+            var userEstabelecimento = user.UserEstabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == estabelecimentoId);
             var token = await GerarToken(user);
-            _emailService.Send(user.Email, "Alteração de senha", EmailTemplate.RecuperarSenha(_configuration, user, token));
+            _emailService.Send(user.Email, "Alteração de senha", EmailTemplate.RecuperarSenha(_configuration, user, token, userEstabelecimento?.Estabelecimento?.Url));
             return ResultDto<bool>.Success(true);
         }
 
@@ -177,12 +267,22 @@ namespace Loja.Application.Services
 
         private async Task<UserDto> GetUserByEmail(string email)
         {            
-            var user = await _userManager?.Users?.FirstOrDefaultAsync(c => c.Email == email);
+            var user = await _userManager?.Users?
+                .Include(x => x.UserEstabelecimentos)
+                .FirstOrDefaultAsync(c => c.Email == email);
 
             var userDto = _mapper.Map<User, UserDto>(user);
 
             if (userDto != null)
-                userDto.Role = await GetUserRole(email);
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                var claims = await _userManager.GetClaimsAsync(user);
+                var estabelecimentos = user.UserEstabelecimentos.Select(x => x.EstabelecimentoId);
+
+                userDto.Role = roles.FirstOrDefault();
+                userDto.Claims = claims;
+                userDto.Estabelecimentos = estabelecimentos;
+            }                
 
             return await Task.FromResult(userDto);           
         }             
@@ -192,27 +292,7 @@ namespace Loja.Application.Services
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(token);
             return await Task.FromResult(Convert.ToBase64String(plainTextBytes));
-        }
-
-        private async Task AddUserRole(UserDto userDto)
-        {
-            var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == userDto.Id);
-            await _userManager.AddToRoleAsync(user, userDto.Role);
-        }
-
-        private async Task<string> GetUserRole(string email)
-        {
-            var user = await _userManager.Users?.FirstOrDefaultAsync(c => c.Email == email);
-            var roles = await _userManager.GetRolesAsync(user);
-            return await Task.FromResult(roles.FirstOrDefault());            
-        }
-
-        private async Task<IList<Claim>> GetUserClaims(string email)
-        {
-            var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.UserName == email);
-            var claims = await _userManager.GetClaimsAsync(user);
-            return await Task.FromResult(claims);
-        }
+        }                
 
         public async Task LogOff()
         {

@@ -16,7 +16,7 @@ namespace Loja.Domain.Entities
         public bool IsFacebook { get; set; }
         public int? EnderecoId { get; set; }
         public virtual Endereco Endereco { get; set; }
-        public virtual IEnumerable<UserEstabelecimento> UserEstabelecimentos { get; set; }
+        public virtual IEnumerable<UserEstabelecimento> UserEstabelecimentos { get; set; } = new List<UserEstabelecimento>();
 
         public void AtualizarUsuario(UserDto userDto)
         {

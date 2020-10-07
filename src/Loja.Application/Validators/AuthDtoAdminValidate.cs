@@ -5,12 +5,12 @@ using System.Linq;
 
 namespace Loja.Application.Validators
 {
-    public class AuthDtoValidate : IValidator
+    public class AuthDtoAdminValidate : IValidator
     {
         private readonly AuthDto _authDto;
         public List<string> Mensagens { get; }
 
-        public AuthDtoValidate(AuthDto authDto)
+        public AuthDtoAdminValidate(AuthDto authDto)
         {
             _authDto = authDto;
             Mensagens = new List<string>();
@@ -22,10 +22,7 @@ namespace Loja.Application.Validators
                 Mensagens.Add("Informe o e-mail!");
 
             if (string.IsNullOrWhiteSpace(_authDto.Senha))
-                Mensagens.Add("Informe a senha!");
-
-            if (_authDto.EstabelecimentoId == 0)
-                Mensagens.Add("Estabelecimento não cadastrado na base!");
+                Mensagens.Add("Informe a senha!");           
 
             return !Mensagens.Any();
         }

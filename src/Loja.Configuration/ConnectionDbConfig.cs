@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Loja.Repository.Context;
 
-namespace Loja.Api.Configuration
+namespace Loja.Configuration
 {
     public static class ConnectionDbConfig
     {

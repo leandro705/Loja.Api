@@ -7,7 +7,7 @@ services:
     build: 
       context: .
     environment: 
-      - ASPNETCORE_ENVIRONMENT=Prodution   
+      - ASPNETCORE_ENVIRONMENT=Production   
     ports:
      - "80:80"    
       

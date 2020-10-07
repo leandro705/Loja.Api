@@ -6,7 +6,7 @@ namespace Loja.Domain.Interfaces.Repository
 {
     public interface IServicoRepository : IRepository<Servico>
     {
-        Task<IEnumerable<Servico>> ObterTodos();
+        Task<IEnumerable<Servico>> ObterTodos(int? estabelecimentoId);
         Task<Servico> ObterPorId(int servicoId);
     }
 }

@@ -8,7 +8,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 
-namespace Loja.Api.Configuration
+namespace Loja.Application
 {
     public class TokenWrite
     {
@@ -44,7 +44,9 @@ namespace Loja.Api.Configuration
                 AccessToken = token,
                 Role = userDto?.Role,
                 IsGoogle = userDto.IsGoogle,
-                IsFacebook = userDto.IsFacebook   
+                IsFacebook = userDto.IsFacebook,
+                EstabelecimentoId = userDto.EstabelecimentoId,
+                IsAdministrador = userDto.Role == "Administrador"
             };
         }
 

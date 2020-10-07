@@ -5,12 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
-using Loja.Api.Configuration;
 using Newtonsoft.Json.Serialization;
 using AutoMapper;
 using Loja.Api.Middlewares;
 using Loja.Application.Mapper;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Loja.Configuration;
 
 namespace Loja.Api
 {

@@ -4,7 +4,7 @@ using Loja.Domain.Interfaces.Services;
 using Loja.Repository.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Loja.Api.Configuration
+namespace Loja.Configuration
 {
     public static class IoCConfig
     {
