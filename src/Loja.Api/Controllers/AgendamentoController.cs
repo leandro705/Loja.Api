@@ -20,13 +20,42 @@ namespace Loja.Api.Controllers
         public AgendamentoController(IAgendamentoService agendamentoService)
         {
             _agendamentoService = agendamentoService;
-        }
+        }        
         
+
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<AgendamentoDto>>), 200)]
-        public async Task<ResultDto<IEnumerable<AgendamentoDto>>> Get()
+        public async Task<ResultDto<IEnumerable<AgendamentoDto>>> GetAll(int? estabelecimentoId)
         {
-            return await _agendamentoService.ObterTodos();
-        } 
+            return await _agendamentoService.ObterTodos(estabelecimentoId);
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ResultDto<AgendamentoDto>), 200)]
+        public async Task<ResultDto<AgendamentoDto>> Get(int id)
+        {
+            return await _agendamentoService.ObterPorId(id);
+        }
+
+        [HttpPost("")]
+        [ProducesResponseType(typeof(ResultDto<AgendamentoDto>), 200)]
+        public async Task<ResultDto<AgendamentoDto>> Post([FromBody] AgendamentoDto agendamentoDto)
+        {
+            return await _agendamentoService.Create(agendamentoDto);
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ResultDto<bool>), 200)]
+        public async Task<ResultDto<bool>> Put(int id, [FromBody] AgendamentoDto agendamentoDto)
+        {
+            return await _agendamentoService.Update(agendamentoDto);
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(ResultDto<bool>), 200)]
+        public async Task<ResultDto<bool>> Delete(int id)
+        {
+            return await _agendamentoService.Delete(id);
+        }
     }
 }

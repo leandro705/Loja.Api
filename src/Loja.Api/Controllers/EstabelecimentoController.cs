@@ -24,7 +24,7 @@ namespace Loja.Api.Controllers
         
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<EstabelecimentoDto>>), 200)]
-        public async Task<ResultDto<IEnumerable<EstabelecimentoDto>>> Get(string url)
+        public async Task<ResultDto<IEnumerable<EstabelecimentoDto>>> GetAll(string url)
         {
             return await _estabelecimentoService.ObterTodos(url);
         }

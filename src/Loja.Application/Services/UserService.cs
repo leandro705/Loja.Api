@@ -21,10 +21,10 @@ namespace Loja.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly SigningConfigurations _signingConfigurations;
         private readonly TokenConfigurations _tokenConfigurations;
-        private readonly IEmailService _emailService;
+        private readonly IEmailService _emailService;               
+
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
-
 
         public UserService(SignInManager<User> signInManager,
                                    UserManager<User> userManager,
@@ -87,7 +87,6 @@ namespace Loja.Application.Services
 
             return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
         }
-
         public async Task<ResultDto<AuthenticatedDto>> LoginSocial(AuthDto authDto)
         {
             var success = await _signInManager.PasswordSignInAsync(authDto.Email, authDto.Senha, false, false);
@@ -129,6 +128,19 @@ namespace Loja.Application.Services
             }
 
             return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
+        }
+        public async Task<ResultDto<IEnumerable<UserDto>>> ObterTodosClientes(int estabelecimentoId)
+        {            
+            var clientesPorEstabelecimento = await _userManager.Users
+                    .Include(x => x.UserEstabelecimentos)                    
+                    .Where(x => x.UserEstabelecimentos.Any(x => x.EstabelecimentoId == estabelecimentoId))
+                    .ToListAsync();           
+
+            if (!clientesPorEstabelecimento.Any())
+                return ResultDto<IEnumerable<UserDto>>.Validation("Usuário não encontrado na base de dados!");
+
+            var userDto = _mapper.Map<IEnumerable<User>, IEnumerable<UserDto>>(clientesPorEstabelecimento);
+            return await Task.FromResult(ResultDto<IEnumerable<UserDto>>.Success(userDto));
         }
 
         public async Task<ResultDto<UserDto>> SalvarCliente(UserDto userDto)
@@ -269,6 +281,7 @@ namespace Loja.Application.Services
         {            
             var user = await _userManager?.Users?
                 .Include(x => x.UserEstabelecimentos)
+                    .ThenInclude(x => x.Estabelecimento)
                 .FirstOrDefaultAsync(c => c.Email == email);
 
             var userDto = _mapper.Map<User, UserDto>(user);

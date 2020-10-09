@@ -1,4 +1,5 @@
-﻿using Loja.CrossCutting.Enumerators;
+﻿using Loja.CrossCutting.Dto;
+using Loja.CrossCutting.Enumerators;
 using System;
 
 namespace Loja.Domain.Entities
@@ -23,5 +24,19 @@ namespace Loja.Domain.Entities
         public int SituacaoId { get; set; }
         public virtual Situacao Situacao { get; set; }
 
+        public void AtualizarAgendamento(AgendamentoDto agendamentoDto)
+        {
+            DataAgendamento = DateTime.Parse(agendamentoDto.DataAgendamento);
+            DataFinalAgendamento = DateTime.Parse(agendamentoDto.DataFinalAgendamento);
+            Observacao = agendamentoDto.Observacao;
+            ServicoId = agendamentoDto.ServicoId;
+            UserId = agendamentoDto.UserId;
+            EstabelecimentoId = agendamentoDto.EstabelecimentoId;
+        }
+
+        public void DesabilitarAgendamento()
+        {
+            SituacaoId = (int)ESituacao.CANCELADO;
+        }
     }
 }

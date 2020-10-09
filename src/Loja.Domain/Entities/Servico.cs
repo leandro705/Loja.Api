@@ -21,6 +21,8 @@ namespace Loja.Domain.Entities
         {
             Nome = servicoDto.Nome;
             Valor = servicoDto.Valor;
+            Duracao = servicoDto.Duracao;
+            EstabelecimentoId = servicoDto.EstabelecimentoId;
         }
 
         public void DesabilitarServico()

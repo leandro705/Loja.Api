@@ -20,7 +20,14 @@ namespace Loja.Api.Controllers
         {
             _userService = userService;
         }
-        
+
+        [HttpGet("clientes")]
+        [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
+        public async Task<ResultDto<IEnumerable<UserDto>>> GetAll(int estabelecimentoId)
+        {
+            return await _userService.ObterTodosClientes(estabelecimentoId);
+        }
+
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
         public async Task<ResultDto<UserDto>> Get(string id)
