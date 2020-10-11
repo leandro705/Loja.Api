@@ -18,16 +18,16 @@ namespace Loja.Repository.EntityConfig
 
             builder.Property(x => x.DataFinalAgendamento)
                .HasColumnType("datetime2")
-               .IsRequired();                       
+               .IsRequired();
+
+            builder.Property(x => x.DataCadastro)
+               .HasColumnType("datetime2")
+               .IsRequired();
 
             builder.Property(x => x.Observacao)
-               .HasColumnType("varchar(500)");
-
-            //builder.Property(x => x.Situacao)
-            //   .IsRequired();
+               .HasColumnType("varchar(500)");            
 
             builder.HasOne(x => x.Situacao);
-
             builder.HasOne(x => x.Servico);
             builder.HasOne(x => x.Usuario);
             builder.HasOne(x => x.Estabelecimento);

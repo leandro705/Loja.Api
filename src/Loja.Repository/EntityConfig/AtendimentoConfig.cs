@@ -16,6 +16,10 @@ namespace Loja.Repository.EntityConfig
                .HasColumnType("datetime2")
                .IsRequired();
 
+            builder.Property(x => x.DataCadastro)
+               .HasColumnType("datetime2")
+               .IsRequired();
+
             builder.Property(x => x.Valor)
                .HasColumnType("decimal(10,2)")
                .IsRequired();
@@ -34,11 +38,13 @@ namespace Loja.Repository.EntityConfig
             builder.HasOne(x => x.Situacao);
             builder.HasOne(x => x.Usuario);
             builder.HasOne(x => x.Estabelecimento);
+            builder.HasOne(x => x.Agendamento);
 
             builder
                 .HasMany(x => x.AtendimentoItens)
-                .WithOne()
-                .HasForeignKey("AtendimentoId");
+                .WithOne()                
+                .HasForeignKey("AtendimentoId")
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -1,7 +1,4 @@
-﻿using Loja.CrossCutting.Enumerators;
-using System;
-
-namespace Loja.CrossCutting.Dto
+﻿namespace Loja.CrossCutting.Dto
 {
     public class AgendamentoDto
     {

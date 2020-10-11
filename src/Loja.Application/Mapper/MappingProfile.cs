@@ -30,8 +30,22 @@ namespace Loja.Application.Mapper
                 .ForMember(d => d.DataAgendamento, dto => dto.MapFrom(s => DateTime.Parse(s.DataAgendamento)))
                 .ForMember(d => d.DataFinalAgendamento, dto => dto.MapFrom(s => DateTime.Parse(s.DataFinalAgendamento)));
 
-            CreateMap<Atendimento, AtendimentoDto>();
-            CreateMap<AtendimentoDto, Atendimento>();
+            CreateMap<Atendimento, AtendimentoDto>()
+                .ForMember(d => d.DataAtendimento, dto => dto.MapFrom(s => s.DataAtendimento.ToString("dd/MM/yyyy")))                
+                .ForMember(d => d.Situacao, dto => dto.MapFrom(s => s.Situacao.Nome))                
+                .ForMember(d => d.EstabelecimentoNome, dto => dto.MapFrom(s => s.Estabelecimento.Nome))
+                .ForMember(d => d.UsuarioNome, dto => dto.MapFrom(s => s.Usuario.Nome))
+                .ForMember(d => d.ValorTotalFormatado, dto => dto.MapFrom(s => s.ValorTotal.ToString("N2", CultureInfo.CurrentCulture)))
+                .ForMember(d => d.DescontoFormatado, dto => dto.MapFrom(s => s.Desconto.ToString("N2", CultureInfo.CurrentCulture)))
+                .ForMember(d => d.ValorFormatado, dto => dto.MapFrom(s => s.Valor.ToString("N2", CultureInfo.CurrentCulture)))
+                .ForMember(d => d.DataCadastro, dto => dto.MapFrom(s => s.DataCadastro.ToString("dd/MM/yyyy HH:mm")));
+            CreateMap<AtendimentoDto, Atendimento>()
+                .ForMember(d => d.DataAtendimento, dto => dto.MapFrom(s => DateTime.Parse(s.DataAtendimento)));
+
+            CreateMap<AtendimentoItem, AtendimentoItemDto>()
+                .ForMember(d => d.ServicoNome, dto => dto.MapFrom(s => s.Servico.Nome))
+                .ForMember(d => d.ValorFormatado, dto => dto.MapFrom(s => s.Valor.ToString("N2", CultureInfo.CurrentCulture)));
+            CreateMap<AtendimentoItemDto, AtendimentoItem>();
 
             CreateMap<Estabelecimento, EstabelecimentoDto>()
                 .ForMember(d => d.Situacao, dto => dto.MapFrom(s => s.Situacao.Nome))
@@ -42,7 +56,7 @@ namespace Loja.Application.Mapper
                 .ForMember(d => d.Situacao, dto => dto.MapFrom(s => s.Situacao.Nome))
                 .ForMember(d => d.EstabelecimentoNome, dto => dto.MapFrom(s => s.Estabelecimento.Nome))
                 .ForMember(d => d.DataCadastro, dto => dto.MapFrom(s => s.DataCadastro.ToString("dd/MM/yyyy HH:mm")))
-                .ForMember(d => d.ValorFormatado, dto => dto.MapFrom(s => s.Valor.ToString("N", CultureInfo.CurrentCulture)));
+                .ForMember(d => d.ValorFormatado, dto => dto.MapFrom(s => s.Valor.ToString("N2", CultureInfo.CurrentCulture)));
             CreateMap<ServicoDto, Servico>();
 
             CreateMap<Endereco, EnderecoDto>()

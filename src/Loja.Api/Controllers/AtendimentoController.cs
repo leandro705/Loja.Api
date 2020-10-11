@@ -21,12 +21,40 @@ namespace Loja.Api.Controllers
         {
             _atendimentoService = atendimentoService;
         }
-        
+
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<AtendimentoDto>>), 200)]
-        public async Task<ResultDto<IEnumerable<AtendimentoDto>>> Get()
+        public async Task<ResultDto<IEnumerable<AtendimentoDto>>> GetAll(int? estabelecimentoId)
         {
-            return await _atendimentoService.ObterTodos();
-        } 
+            return await _atendimentoService.ObterTodos(estabelecimentoId);
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ResultDto<AtendimentoDto>), 200)]
+        public async Task<ResultDto<AtendimentoDto>> Get(int id)
+        {
+            return await _atendimentoService.ObterPorId(id);
+        }
+
+        [HttpPost("")]
+        [ProducesResponseType(typeof(ResultDto<AtendimentoDto>), 200)]
+        public async Task<ResultDto<AtendimentoDto>> Post([FromBody] AtendimentoDto atendimentoDto)
+        {
+            return await _atendimentoService.Create(atendimentoDto);
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ResultDto<bool>), 200)]
+        public async Task<ResultDto<bool>> Put(int id, [FromBody] AtendimentoDto atendimentoDto)
+        {
+            return await _atendimentoService.Update(atendimentoDto);
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(ResultDto<bool>), 200)]
+        public async Task<ResultDto<bool>> Delete(int id)
+        {
+            return await _atendimentoService.Delete(id);
+        }
     }
 }

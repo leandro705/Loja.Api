@@ -24,10 +24,10 @@ namespace Loja.Repository.EntityConfig
                .HasColumnType("datetime2");
 
             builder.Property(x => x.Telefone)
-               .HasColumnType("varchar(12)");
+               .HasColumnType("varchar(15)");
 
             builder.Property(x => x.Celular)
-               .HasColumnType("varchar(12)");
+               .HasColumnType("varchar(15)");
 
             builder.HasOne(x => x.Endereco);            
         }
