@@ -33,7 +33,7 @@ namespace Loja.Application.Services
             var agendamentoDto = _mapper.Map<IEnumerable<Agendamento>, IEnumerable<AgendamentoDto>>(agendamentos);
 
             return await Task.FromResult(ResultDto<IEnumerable<AgendamentoDto>>.Success(agendamentoDto));
-        }
+        } 
 
         public async Task<ResultDto<AgendamentoDto>> ObterPorId(int agendamentoId)
         {
