@@ -20,8 +20,14 @@ namespace Loja.Api.Controllers
         public AgendamentoController(IAgendamentoService agendamentoService)
         {
             _agendamentoService = agendamentoService;
-        }        
-        
+        }
+
+        [HttpGet("calendario")]
+        [ProducesResponseType(typeof(ResultDto<IEnumerable<AgendamentoDto>>), 200)]
+        public async Task<ResultDto<IEnumerable<AgendamentoDto>>> GetCalendario(DateTime inicio, DateTime final, int? estabelecimentoId, string usuarioId)
+        {
+            return await _agendamentoService.ObterTodosCalendario(inicio, final, estabelecimentoId, usuarioId);
+        }
 
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<AgendamentoDto>>), 200)]

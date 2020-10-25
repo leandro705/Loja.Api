@@ -18,10 +18,10 @@ namespace Loja.Application.Validators
 
         public bool Validate()
         {
-            if (string.IsNullOrWhiteSpace(_agendamentoDto.DataAgendamento))
+            if (string.IsNullOrWhiteSpace(_agendamentoDto.DataAgendamentoStr))
                 Mensagens.Add("Informe a data agendamento!");
 
-            if (string.IsNullOrWhiteSpace(_agendamentoDto.DataFinalAgendamento))
+            if (string.IsNullOrWhiteSpace(_agendamentoDto.DataFinalAgendamentoStr))
                 Mensagens.Add("Informe a data final agendamento!");
 
             if (_agendamentoDto.ServicoId == 0)

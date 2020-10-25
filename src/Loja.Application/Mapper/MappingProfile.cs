@@ -20,15 +20,16 @@ namespace Loja.Application.Mapper
             CreateMap<MunicipioDto, Municipio>();
 
             CreateMap<Agendamento, AgendamentoDto>()
-                .ForMember(d => d.DataAgendamento, dto => dto.MapFrom(s => s.DataAgendamento.ToString("dd/MM/yyyy HH:mm")))
-                .ForMember(d => d.DataFinalAgendamento, dto => dto.MapFrom(s => s.DataFinalAgendamento.ToString("dd/MM/yyyy HH:mm")))
+                .ForMember(d => d.DataAgendamentoStr, dto => dto.MapFrom(s => s.DataAgendamento.ToString("dd/MM/yyyy HH:mm")))
+                .ForMember(d => d.DataFinalAgendamentoStr, dto => dto.MapFrom(s => s.DataFinalAgendamento.ToString("dd/MM/yyyy HH:mm")))
                 .ForMember(d => d.Situacao, dto => dto.MapFrom(s => s.Situacao.Nome))
                 .ForMember(d => d.ServicoNome, dto => dto.MapFrom(s => s.Servico.Nome))
                 .ForMember(d => d.EstabelecimentoNome, dto => dto.MapFrom(s => s.Estabelecimento.Nome))
+                .ForMember(d => d.UsuarioNome, dto => dto.MapFrom(s => s.Usuario.Nome))
                 .ForMember(d => d.DataCadastro, dto => dto.MapFrom(s => s.DataCadastro.ToString("dd/MM/yyyy HH:mm")));
             CreateMap<AgendamentoDto, Agendamento>()
-                .ForMember(d => d.DataAgendamento, dto => dto.MapFrom(s => DateTime.Parse(s.DataAgendamento)))
-                .ForMember(d => d.DataFinalAgendamento, dto => dto.MapFrom(s => DateTime.Parse(s.DataFinalAgendamento)));
+                .ForMember(d => d.DataAgendamento, dto => dto.MapFrom(s => DateTime.Parse(s.DataAgendamentoStr)))
+                .ForMember(d => d.DataFinalAgendamento, dto => dto.MapFrom(s => DateTime.Parse(s.DataFinalAgendamentoStr)));
 
             CreateMap<Atendimento, AtendimentoDto>()
                 .ForMember(d => d.DataAtendimento, dto => dto.MapFrom(s => s.DataAtendimento.ToString("dd/MM/yyyy")))                

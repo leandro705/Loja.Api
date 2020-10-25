@@ -23,6 +23,18 @@ namespace Loja.Application.Services
             _mapper = mapper;
         }       
 
+        public async Task<ResultDto<IEnumerable<AgendamentoDto>>> ObterTodosCalendario(DateTime inicio, DateTime final, int? estabelecimentoId, string usuarioId)
+        {
+            var agendamentos = await _agendamentoRepository.ObterTodosCalendario(inicio, final, estabelecimentoId, usuarioId);
+
+            if (!agendamentos.Any())
+                return ResultDto<IEnumerable<AgendamentoDto>>.Validation("Agendamentos não encontrado na base de dados!");
+
+            var agendamentoDto = _mapper.Map<IEnumerable<Agendamento>, IEnumerable<AgendamentoDto>>(agendamentos);
+
+            return await Task.FromResult(ResultDto<IEnumerable<AgendamentoDto>>.Success(agendamentoDto));
+        }
+
         public async Task<ResultDto<IEnumerable<AgendamentoDto>>> ObterTodos(int? estabelecimentoId)
         {
             var agendamentos = await _agendamentoRepository.ObterTodos(estabelecimentoId);
@@ -33,7 +45,7 @@ namespace Loja.Application.Services
             var agendamentoDto = _mapper.Map<IEnumerable<Agendamento>, IEnumerable<AgendamentoDto>>(agendamentos);
 
             return await Task.FromResult(ResultDto<IEnumerable<AgendamentoDto>>.Success(agendamentoDto));
-        } 
+        }
 
         public async Task<ResultDto<AgendamentoDto>> ObterPorId(int agendamentoId)
         {

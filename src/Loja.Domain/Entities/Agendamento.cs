@@ -26,8 +26,8 @@ namespace Loja.Domain.Entities
 
         public void AtualizarAgendamento(AgendamentoDto agendamentoDto)
         {
-            DataAgendamento = DateTime.Parse(agendamentoDto.DataAgendamento);
-            DataFinalAgendamento = DateTime.Parse(agendamentoDto.DataFinalAgendamento);
+            DataAgendamento = DateTime.Parse(agendamentoDto.DataAgendamentoStr);
+            DataFinalAgendamento = DateTime.Parse(agendamentoDto.DataFinalAgendamentoStr);
             Observacao = agendamentoDto.Observacao;
             ServicoId = agendamentoDto.ServicoId;
             UserId = agendamentoDto.UserId;
