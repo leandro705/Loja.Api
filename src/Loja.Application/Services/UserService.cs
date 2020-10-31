@@ -143,6 +143,74 @@ namespace Loja.Application.Services
             return await Task.FromResult(ResultDto<IEnumerable<UserDto>>.Success(userDto));
         }
 
+        public async Task<ResultDto<IEnumerable<UserDto>>> ObterTodos(int? estabelecimentoId)
+        {
+            var clientesPorEstabelecimento = await _userManager.Users
+                    .Include(x => x.UserEstabelecimentos)
+                        .ThenInclude(x => x.Estabelecimento)                   
+                    .Where(x => !estabelecimentoId.HasValue || x.UserEstabelecimentos.Any(x => x.EstabelecimentoId == estabelecimentoId))
+                    .ToListAsync();          
+
+            if (!clientesPorEstabelecimento.Any())
+                return ResultDto<IEnumerable<UserDto>>.Validation("Usuário não encontrado na base de dados!");
+
+            var usersDto = new List<UserDto>();
+
+            foreach (var usuario in clientesPorEstabelecimento)
+            {
+                var userDto = _mapper.Map<User, UserDto>(usuario);                
+                var roles = await _userManager.GetRolesAsync(usuario);
+                var claims = await _userManager.GetClaimsAsync(usuario);
+                   
+                userDto.Role = roles.FirstOrDefault();
+                userDto.Claims = claims;
+
+                usersDto.Add(userDto);
+            }
+           
+            return await Task.FromResult(ResultDto<IEnumerable<UserDto>>.Success(usersDto));
+        }
+
+        public async Task<ResultDto<UserDto>> SalvarUsuario(UserDto userDto)
+        {
+            var userDtoValidate = new UserDtoValidate(userDto);
+            if (!userDtoValidate.Validate())
+                return ResultDto<UserDto>.Validation(userDtoValidate.Mensagens);
+
+            var usuarioJaCadastrado = await _userManager.Users.FirstOrDefaultAsync(c => c.Email == userDto.Email);
+
+            if (usuarioJaCadastrado != null && usuarioJaCadastrado.IsGoogle)
+                return ResultDto<UserDto>.Validation("Email já cadastrado via google!");
+            else if (usuarioJaCadastrado != null && usuarioJaCadastrado.IsFacebook)
+                return ResultDto<UserDto>.Validation("Email já cadastrado via facebook!");
+            else if (usuarioJaCadastrado != null)
+                return ResultDto<UserDto>.Validation("Email já cadastrado!");
+                        
+            var user = new User(userDto);
+            if (userDto.Role != "Administrador")
+            {
+                var userEstabelecimentos = new List<UserEstabelecimento> { new UserEstabelecimento() { EstabelecimentoId = userDto.EstabelecimentoId } };
+                user.VincularEstabelecimento(userEstabelecimentos);
+            }
+
+            var result = await _userManager.CreateAsync(user, userDto.Senha);
+            userDto.Id = user.Id;
+
+            if (result.Succeeded && !string.IsNullOrWhiteSpace(userDto.Role))
+            {
+                var userDB = await _userManager.Users
+                    .Include(x => x.UserEstabelecimentos)
+                    .ThenInclude(x => x.Estabelecimento)
+                    .FirstOrDefaultAsync(u => u.Id == userDto.Id);
+
+                userDto.EstabelecimentoNomeUrl = userDB.UserEstabelecimentos.FirstOrDefault().Estabelecimento.Url;
+                await _userManager.AddToRoleAsync(userDB, userDto.Role);
+                _emailService.Send(userDto.Email, "Confirmação de cadastro", EmailTemplate.ConfirmacaoCadastro(_configuration, userDto));
+            }
+
+            return await Task.FromResult(ResultDto<UserDto>.Success(userDto));
+        }
+
         public async Task<ResultDto<UserDto>> SalvarCliente(UserDto userDto)
         {
             userDto.Role = "Cliente";
@@ -169,16 +237,8 @@ namespace Loja.Application.Services
             else if(usuarioJaCadastrado != null)
                 return ResultDto<UserDto>.Validation("Email já cadastrado!");
             var userEstabelecimentos = new List<UserEstabelecimento> { new UserEstabelecimento() { EstabelecimentoId = userDto.EstabelecimentoId }};
-            var user = new User
-            {
-                UserName = userDto.Email,
-                Email = userDto.Email,
-                Nome = userDto.Nome,                
-                IsFacebook = userDto.IsFacebook,
-                IsGoogle = userDto.IsGoogle,
-                DataCadastro = DateTime.Now,
-                UserEstabelecimentos = userEstabelecimentos
-            };           
+            var user = new User(userDto);
+            user.VincularEstabelecimento(userEstabelecimentos);
 
             var result = await _userManager.CreateAsync(user, userDto.Senha);
             userDto.Id = user.Id;
@@ -276,6 +336,23 @@ namespace Loja.Application.Services
 
             return await Task.FromResult(ResultDto<bool>.Success(result.Succeeded));
         }
+
+        public async Task<ResultDto<bool>> Delete(string usuarioId)
+        {
+            var user = await _userManager.Users
+                 .Include(x => x.Agendamentos)
+                .FirstOrDefaultAsync(u => u.Id == usuarioId);
+
+            if (user == null)
+                return ResultDto<bool>.Validation("Usuário não encontrado na base de dados!");
+
+            if (user.Agendamentos.Any())
+                return ResultDto<bool>.Validation("Usuário possui agendamentos vinculados!");
+
+            await _userManager.DeleteAsync(user);
+
+            return await Task.FromResult(ResultDto<bool>.Success(true));
+        }        
 
         private async Task<UserDto> GetUserByEmail(string email)
         {            

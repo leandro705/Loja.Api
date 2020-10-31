@@ -10,7 +10,8 @@ namespace Loja.Application.Mapper
     {
         public MappingProfile()
         {
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>()
+                .ForMember(d => d.DataCadastro, dto => dto.MapFrom(s => s.DataCadastro.ToString("dd/MM/yyyy HH:mm")));
             CreateMap<UserDto, User>();
 
             CreateMap<Estado, EstadoDto>();

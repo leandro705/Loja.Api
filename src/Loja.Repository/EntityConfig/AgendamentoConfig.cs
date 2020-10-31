@@ -29,8 +29,13 @@ namespace Loja.Repository.EntityConfig
 
             builder.HasOne(x => x.Situacao);
             builder.HasOne(x => x.Servico);
-            builder.HasOne(x => x.Usuario);
+            builder.HasOne(x => x.Usuario);           
             builder.HasOne(x => x.Estabelecimento);
+
+            builder
+              .HasOne(x => x.Usuario)
+              .WithMany(x => x.Agendamentos)
+              .HasForeignKey(x => x.UserId);
         }
     }
 }

@@ -20,7 +20,8 @@ namespace Loja.CrossCutting.Dto
         public bool IsGoogle { get; set; }
         public bool IsFacebook { get; set; }
         public EnderecoDto Endereco { get; set; }
+        public string DataCadastro { get; set; }
 
-        
+
     }
 }

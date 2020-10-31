@@ -28,6 +28,13 @@ namespace Loja.Api.Controllers
             return await _userService.ObterTodosClientes(estabelecimentoId);
         }
 
+        [HttpGet("")]
+        [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
+        public async Task<ResultDto<IEnumerable<UserDto>>> GetAll(int? estabelecimentoId)
+        {
+            return await _userService.ObterTodos(estabelecimentoId);
+        }
+
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
         public async Task<ResultDto<UserDto>> Get(string id)
@@ -48,6 +55,21 @@ namespace Loja.Api.Controllers
         public async Task<ResultDto<bool>> AtualizarSenha([FromBody] UserDto userDto)
         {
             return await _userService.AtualizarSenha(userDto);           
+        }
+
+
+        [HttpPost("")]
+        [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
+        public async Task<ResultDto<UserDto>> Post([FromBody] UserDto userDto)
+        {
+            return await _userService.SalvarUsuario(userDto);
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(ResultDto<bool>), 200)]
+        public async Task<ResultDto<bool>> Delete(string id)
+        {
+            return await _userService.Delete(id);
         }
     }
 }
