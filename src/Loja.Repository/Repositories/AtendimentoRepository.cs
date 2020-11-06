@@ -33,5 +33,37 @@ namespace Loja.Repository.Repositories
                     .ThenInclude(x => x.Servico)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<int> ObterTotalAtendimentos(int? estabelecimentoId, string usuarioId, int? situacaoId)
+        {
+            var total = await _context.Set<Atendimento>()
+                   .CountAsync(x => (!estabelecimentoId.HasValue || x.EstabelecimentoId == estabelecimentoId) &&
+                   (string.IsNullOrEmpty(usuarioId) || x.UserId == usuarioId) &&
+                   (!situacaoId.HasValue || x.SituacaoId == situacaoId));
+
+            return await Task.FromResult(total);
+        }
+
+        public async Task<int> ObterTotalAtendimentosMes(int? estabelecimentoId, string usuarioId, int? situacaoId, int mes, int ano)
+        {
+            var total = await _context.Set<Atendimento>()
+                   .CountAsync(x => x.DataAtendimento.Month == mes && x.DataAtendimento.Year == ano &&
+                   (!estabelecimentoId.HasValue || x.EstabelecimentoId == estabelecimentoId) &&
+                   (string.IsNullOrEmpty(usuarioId) || x.UserId == usuarioId) &&
+                   (!situacaoId.HasValue || x.SituacaoId == situacaoId));
+
+            return await Task.FromResult(total);
+        }
+
+        public async Task<decimal> ObterValorTotal(int? estabelecimentoId, string usuarioId, int? situacaoId)
+        {
+            var total = await _context.Set<Atendimento>()
+                   .Where(x => (!estabelecimentoId.HasValue || x.EstabelecimentoId == estabelecimentoId) &&
+                   (string.IsNullOrEmpty(usuarioId) || x.UserId == usuarioId) &&
+                   (!situacaoId.HasValue || x.SituacaoId == situacaoId))
+                   .SumAsync(x => x.ValorTotal);
+
+            return await Task.FromResult(total);
+        }
     }
 }

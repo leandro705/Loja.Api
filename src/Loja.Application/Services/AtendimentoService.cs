@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Loja.CrossCutting.Enumerators;
 using Loja.Application.Validators;
 using System;
+using Loja.CrossCutting.Util;
 
 namespace Loja.Application.Services
 {
@@ -82,6 +83,39 @@ namespace Loja.Application.Services
             atendimento.DesabilitarAtendimento();
             await _atendimentoRepository.Update(atendimento);
             return await Task.FromResult(ResultDto<bool>.Success(true));
+        }
+        
+        public async Task<ResultDto<int>> TotalAtendimentos(int? estabelecimentoId, string usuarioId, int? situacaoId)
+        {
+            var total = await _atendimentoRepository.ObterTotalAtendimentos(estabelecimentoId, usuarioId, situacaoId);
+
+            return await Task.FromResult(ResultDto<int>.Success(total));
+        }
+
+        public async Task<ResultDto<List<TotalizadorMesDto>>> TotalAtendimentosMes(int? estabelecimentoId, string usuarioId, int? situacaoId)
+        {
+            var ano = DateTime.Now.Year;
+
+            var meses = Enum.GetValues(typeof(EMeses)).Cast<EMeses>().ToList();
+            var totalizadorMesDto = new List<TotalizadorMesDto>();
+            foreach (var mes in meses)
+            {
+                totalizadorMesDto.Add(new TotalizadorMesDto()
+                {
+                    Total = await _atendimentoRepository.ObterTotalAtendimentosMes(estabelecimentoId, usuarioId, situacaoId, (int)mes, ano),
+                    Mes = mes.GetDescription(),
+                    Ano = ano
+                });
+            }
+       
+            return await Task.FromResult(ResultDto<List<TotalizadorMesDto>>.Success(totalizadorMesDto));
+        }
+
+        public async Task<ResultDto<decimal>> ValorTotal(int? estabelecimentoId, string usuarioId, int? situacaoId)
+        {
+            var total = await _atendimentoRepository.ObterValorTotal(estabelecimentoId, usuarioId, situacaoId);
+
+            return await Task.FromResult(ResultDto<decimal>.Success(total));
         }
     }
 }

@@ -13,5 +13,6 @@ namespace Loja.Domain.Interfaces.Services
         Task<ResultDto<AgendamentoDto>> Create(AgendamentoDto agendamentoDto);
         Task<ResultDto<bool>> Update(AgendamentoDto agendamentoDto);
         Task<ResultDto<bool>> Delete(int servicoId);
+        Task<ResultDto<int>> TotalAgendamentos(int? estabelecimentoId, string usuarioId);
     }
 }

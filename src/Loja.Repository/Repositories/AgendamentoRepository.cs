@@ -51,5 +51,14 @@ namespace Loja.Repository.Repositories
                 .Include(x => x.Estabelecimento)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<int> ObterTotalAgendamentos(int? estabelecimentoId, string usuarioId)
+        {
+            var totalCadastrado = await _context.Set<Agendamento>()                 
+                   .CountAsync(x => (!estabelecimentoId.HasValue || x.EstabelecimentoId == estabelecimentoId) &&
+                   (string.IsNullOrEmpty(usuarioId) || x.UserId == usuarioId) && x.SituacaoId != (int)ESituacao.CANCELADO);
+
+            return await Task.FromResult(totalCadastrado);
+        }
     }
 }

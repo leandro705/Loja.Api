@@ -11,5 +11,8 @@ namespace Loja.Domain.Interfaces.Services
         Task<ResultDto<AtendimentoDto>> Create(AtendimentoDto atendimentoDto);
         Task<ResultDto<bool>> Update(AtendimentoDto atendimentoDto);
         Task<ResultDto<bool>> Delete(int atendimentoId);
+        Task<ResultDto<int>> TotalAtendimentos(int? estabelecimentoId, string usuarioId, int? situacaoId);
+        Task<ResultDto<List<TotalizadorMesDto>>> TotalAtendimentosMes(int? estabelecimentoId, string usuarioId, int? situacaoId);        
+        Task<ResultDto<decimal>> ValorTotal(int? estabelecimentoId, string usuarioId, int? situacaoId);
     }
 }

@@ -67,6 +67,17 @@ namespace Loja.Application.Services
 
             return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
         }
+
+        public async Task<ResultDto<int>> GetTotalCadastrado(int? estabelecimentoId, string usuarioId)
+        {
+            var totalCadastrado = await _userManager.Users
+                   .Include(x => x.UserEstabelecimentos)
+                   .CountAsync(x => x.UserEstabelecimentos.Any(x => !estabelecimentoId.HasValue || x.EstabelecimentoId == estabelecimentoId) &&
+                   (string.IsNullOrEmpty(usuarioId) || x.Id == usuarioId));
+
+            return await Task.FromResult(ResultDto<int>.Success(totalCadastrado));
+        }
+
         public async Task<ResultDto<AuthenticatedDto>> LoginAdmin(AuthDto authDto)
         {
             var success = await _signInManager.PasswordSignInAsync(authDto.Email, authDto.Senha, false, false);

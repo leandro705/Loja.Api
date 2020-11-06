@@ -8,5 +8,9 @@ namespace Loja.Domain.Interfaces.Repository
     {
         Task<IEnumerable<Atendimento>> ObterTodos(int? estabelecimentoId);
         Task<Atendimento> ObterPorId(int atendimentoId);
+        Task<int> ObterTotalAtendimentos(int? estabelecimentoId, string usuarioId, int? situacaoId);
+        Task<int> ObterTotalAtendimentosMes(int? estabelecimentoId, string usuarioId, int? situacaoId, int mes, int ano);
+        Task<decimal> ObterValorTotal(int? estabelecimentoId, string usuarioId, int? situacaoId);
+        
     }
 }

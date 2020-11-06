@@ -91,5 +91,12 @@ namespace Loja.Application.Services
             await _agendamentoRepository.Update(agendamento);
             return await Task.FromResult(ResultDto<bool>.Success(true));
         }
+
+        public async Task<ResultDto<int>> TotalAgendamentos(int? estabelecimentoId, string usuarioId)
+        {
+            var totalCadastrado = await _agendamentoRepository.ObterTotalAgendamentos(estabelecimentoId, usuarioId);
+
+            return await Task.FromResult(ResultDto<int>.Success(totalCadastrado));
+        }        
     }
 }
