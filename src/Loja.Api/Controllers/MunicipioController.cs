@@ -13,6 +13,7 @@ namespace Loja.Api.Controllers
 {
     [EnableCors("ApiCorsPolicy")]    
     [Route("api/municipios")]
+    [Authorize]
     public class MunicipioController : Controller
     {
         private readonly IMunicipioService _municipioService;
@@ -21,7 +22,8 @@ namespace Loja.Api.Controllers
         {
             _municipioService = municipioService;
         }
-        
+
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpGet("estado/{id}")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<MunicipioDto>>), 200)]
         public async Task<ResultDto<IEnumerable<MunicipioDto>>> Get(int id)

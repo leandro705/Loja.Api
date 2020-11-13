@@ -52,7 +52,7 @@ namespace Loja.Application.Services
            
             var applicationUser = await GetUserByEmail(authDto.Email);
 
-            if(!applicationUser.Estabelecimentos.Contains(authDto.EstabelecimentoId))
+            if(!applicationUser.Estabelecimentos.Any(x => x.EstabelecimentoId == authDto.EstabelecimentoId))
                 return ResultDto<AuthenticatedDto>.Validation("Usuário não vinculado ao estabalecimento!");                       
 
             var userDto = new UserDto
@@ -62,7 +62,9 @@ namespace Loja.Application.Services
                 Email = applicationUser.Email,
                 Role = applicationUser.Role,
                 Claims = applicationUser.Claims,
-                EstabelecimentoId = authDto.EstabelecimentoId
+                EstabelecimentoId = authDto.EstabelecimentoId,
+                EstabelecimentoNomeUrl = applicationUser.Estabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == authDto.EstabelecimentoId).Url,
+                EstabelecimentoNome = applicationUser.Estabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == authDto.EstabelecimentoId).Nome
             };
 
             return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
@@ -86,7 +88,10 @@ namespace Loja.Application.Services
                 return ResultDto<AuthenticatedDto>.Validation("Login ou senha inválidos!");
 
             var applicationUser = await GetUserByEmail(authDto.Email);
-                       
+
+            if (applicationUser.Role != "Administrador")
+                return ResultDto<AuthenticatedDto>.Validation("Perfil não é Administrador!");
+
             var userDto = new UserDto
             {
                 Id = applicationUser.Id,
@@ -124,7 +129,7 @@ namespace Loja.Application.Services
             {
                 var applicationUser = await GetUserByEmail(authDto.Email);
 
-                if (!applicationUser.Estabelecimentos.Contains(authDto.EstabelecimentoId))
+                if (!applicationUser.Estabelecimentos.Any(x => x.EstabelecimentoId == authDto.EstabelecimentoId))
                     return ResultDto<AuthenticatedDto>.Validation("Usuário não vinculado ao estabalecimento!");
 
                 userDto = new UserDto
@@ -134,7 +139,9 @@ namespace Loja.Application.Services
                     Email = applicationUser.Email,
                     Role = applicationUser.Role,
                     Claims = applicationUser.Claims,
-                    EstabelecimentoId = authDto.EstabelecimentoId
+                    EstabelecimentoId = authDto.EstabelecimentoId,
+                    EstabelecimentoNomeUrl = applicationUser.Estabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == authDto.EstabelecimentoId).Url,
+                    EstabelecimentoNome = applicationUser.Estabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == authDto.EstabelecimentoId).Nome
                 };
             }
 
@@ -378,11 +385,18 @@ namespace Loja.Application.Services
             {
                 var roles = await _userManager.GetRolesAsync(user);
                 var claims = await _userManager.GetClaimsAsync(user);
-                var estabelecimentos = user.UserEstabelecimentos.Select(x => x.EstabelecimentoId);
+                var estabelecimentos = user.UserEstabelecimentos
+                    .Select(x => new EstabelecimentoDto()
+                    {
+                        EstabelecimentoId = x.EstabelecimentoId,
+                        Nome = x.Estabelecimento.Nome,
+                        Url = x.Estabelecimento.Url
+                    });
 
                 userDto.Role = roles.FirstOrDefault();
                 userDto.Claims = claims;
                 userDto.Estabelecimentos = estabelecimentos;
+               
             }                
 
             return await Task.FromResult(userDto);           

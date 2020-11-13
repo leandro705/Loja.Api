@@ -3,8 +3,10 @@
     public class AuthenticatedDto
     {
         public string Id { get; set; }
-        public int EstabelecimentoId { get; set; }
-        public string Email { get; set; }        
+        public int EstabelecimentoId { get; set; }        
+        public string EstabelecimentoNomeUrl { get; set; }
+        public string EstabelecimentoNome { get; set; }
+        public string Email { get; set; }
         public string Nome { get; set; }
         public bool Authenticated { get; set; }
         public string Created { get; set; }

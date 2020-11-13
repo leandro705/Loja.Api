@@ -15,8 +15,9 @@ namespace Loja.CrossCutting.Dto
         public string Role { get; set; }
         public int EstabelecimentoId { get; set; }
         public string EstabelecimentoNomeUrl { get; set; }
+        public string EstabelecimentoNome { get; set; }
         public IEnumerable<Claim> Claims { get; set; }
-        public IEnumerable<int> Estabelecimentos { get; set; }
+        public IEnumerable<EstabelecimentoDto> Estabelecimentos { get; set; }
         public bool IsGoogle { get; set; }
         public bool IsFacebook { get; set; }
         public EnderecoDto Endereco { get; set; }

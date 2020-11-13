@@ -13,6 +13,7 @@ namespace Loja.Api.Controllers
 {
     [EnableCors("ApiCorsPolicy")]    
     [Route("api/agendamentos")]
+    [Authorize]
     public class AgendamentoController : Controller
     {
         private readonly IAgendamentoService _agendamentoService;
@@ -22,6 +23,7 @@ namespace Loja.Api.Controllers
             _agendamentoService = agendamentoService;
         }
 
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpGet("calendario")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<AgendamentoDto>>), 200)]
         public async Task<ResultDto<IEnumerable<AgendamentoDto>>> GetCalendario(DateTime inicio, DateTime final, int? estabelecimentoId, string usuarioId)
@@ -29,6 +31,7 @@ namespace Loja.Api.Controllers
             return await _agendamentoService.ObterTodosCalendario(inicio, final, estabelecimentoId, usuarioId);
         }
 
+        [Authorize(Roles = "Administrador,Gerente")]
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<AgendamentoDto>>), 200)]
         public async Task<ResultDto<IEnumerable<AgendamentoDto>>> GetAll(int? estabelecimentoId)
@@ -36,6 +39,7 @@ namespace Loja.Api.Controllers
             return await _agendamentoService.ObterTodos(estabelecimentoId);
         }
 
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ResultDto<AgendamentoDto>), 200)]
         public async Task<ResultDto<AgendamentoDto>> Get(int id)
@@ -43,6 +47,7 @@ namespace Loja.Api.Controllers
             return await _agendamentoService.ObterPorId(id);
         }
 
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpPost("")]
         [ProducesResponseType(typeof(ResultDto<AgendamentoDto>), 200)]
         public async Task<ResultDto<AgendamentoDto>> Post([FromBody] AgendamentoDto agendamentoDto)
@@ -50,6 +55,7 @@ namespace Loja.Api.Controllers
             return await _agendamentoService.Create(agendamentoDto);
         }
 
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ResultDto<bool>), 200)]
         public async Task<ResultDto<bool>> Put(int id, [FromBody] AgendamentoDto agendamentoDto)
@@ -57,6 +63,7 @@ namespace Loja.Api.Controllers
             return await _agendamentoService.Update(agendamentoDto);
         }
 
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(ResultDto<bool>), 200)]
         public async Task<ResultDto<bool>> Delete(int id)

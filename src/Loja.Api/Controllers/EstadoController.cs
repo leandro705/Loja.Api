@@ -13,6 +13,7 @@ namespace Loja.Api.Controllers
 {
     [EnableCors("ApiCorsPolicy")]    
     [Route("api/estados")]
+    [Authorize]
     public class EstadoController : Controller
     {
         private readonly IEstadoService _estadoService;
@@ -21,7 +22,8 @@ namespace Loja.Api.Controllers
         {
             _estadoService = estadoService;
         }
-        
+
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<EstadoDto>>), 200)]
         public async Task<ResultDto<IEnumerable<EstadoDto>>> Get()

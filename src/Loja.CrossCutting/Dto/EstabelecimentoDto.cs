@@ -1,6 +1,4 @@
-﻿using Loja.CrossCutting.Enumerators;
-
-namespace Loja.CrossCutting.Dto
+﻿namespace Loja.CrossCutting.Dto
 {
     public class EstabelecimentoDto
     {

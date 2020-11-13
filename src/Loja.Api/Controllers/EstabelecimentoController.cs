@@ -13,6 +13,7 @@ namespace Loja.Api.Controllers
 {
     [EnableCors("ApiCorsPolicy")]    
     [Route("api/estabelecimentos")]
+    [Authorize]
     public class EstabelecimentoController : Controller
     {
         private readonly IEstabelecimentoService _estabelecimentoService;
@@ -21,7 +22,16 @@ namespace Loja.Api.Controllers
         {
             _estabelecimentoService = estabelecimentoService;
         }
-        
+
+        [AllowAnonymous]
+        [HttpGet("{url}/dadosLogin")]
+        [ProducesResponseType(typeof(ResultDto<EstabelecimentoDto>), 200)]
+        public async Task<ResultDto<EstabelecimentoDto>> ObterPorUrl(string url)
+        {
+            return await _estabelecimentoService.ObterPorUrl(url);
+        }
+
+        [Authorize(Roles = "Administrador,Gerente")]
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<EstabelecimentoDto>>), 200)]
         public async Task<ResultDto<IEnumerable<EstabelecimentoDto>>> GetAll(string url)
@@ -29,13 +39,15 @@ namespace Loja.Api.Controllers
             return await _estabelecimentoService.ObterTodos(url);
         }
 
+        [Authorize(Roles = "Administrador,Gerente")]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ResultDto<EstabelecimentoDto>), 200)]
         public async Task<ResultDto<EstabelecimentoDto>> Get(int id)
         {
             return await _estabelecimentoService.ObterPorId(id);
-        }        
+        }
 
+        [Authorize(Roles = "Administrador")]
         [HttpPost("")]
         [ProducesResponseType(typeof(ResultDto<EstabelecimentoDto>), 200)]
         public async Task<ResultDto<EstabelecimentoDto>> Post([FromBody] EstabelecimentoDto estabelecimentoDto)
@@ -43,6 +55,7 @@ namespace Loja.Api.Controllers
             return await _estabelecimentoService.Create(estabelecimentoDto);
         }
 
+        [Authorize(Roles = "Administrador,Gerente")]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ResultDto<bool>), 200)]
         public async Task<ResultDto<bool>> Put(int id, [FromBody] EstabelecimentoDto estabelecimentoDto)
@@ -50,6 +63,7 @@ namespace Loja.Api.Controllers
             return await _estabelecimentoService.Update(estabelecimentoDto);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(ResultDto<bool>), 200)]
         public async Task<ResultDto<bool>> Delete(int id)

@@ -46,5 +46,10 @@ namespace Loja.Domain.Entities
         {
             SituacaoId = (int)ESituacao.CANCELADO;
         }
+
+        public void FinalizarAtendimento()
+        {
+            SituacaoId = (int)ESituacao.FINALIZADO;
+        }
     }
 }

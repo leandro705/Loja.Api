@@ -13,6 +13,7 @@ namespace Loja.CrossCutting.Dto
 
         public int ServicoId { get; set; }
         public string ServicoNome { get; set; }
+        public decimal ServicoValor { get; set; }
         public string UserId { get; set; }
         public string UsuarioNome { get; set; }
 
@@ -20,5 +21,7 @@ namespace Loja.CrossCutting.Dto
         public string Situacao { get; set; }
         public int EstabelecimentoId { get; set; }
         public string EstabelecimentoNome { get; set; }
+
+        public bool PossuiAtendimento { get; set; }
     }
 }

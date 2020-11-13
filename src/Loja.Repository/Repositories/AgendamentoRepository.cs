@@ -26,6 +26,7 @@ namespace Loja.Repository.Repositories
                 .Include(x => x.Servico)
                 .Include(x => x.Usuario)
                 .Include(x => x.Estabelecimento)
+                .Include(x => x.Atendimentos)
                 .ToListAsync();
         }
 
@@ -38,6 +39,7 @@ namespace Loja.Repository.Repositories
                 .Include(x => x.Servico)
                 .Include(x => x.Usuario)
                 .Include(x => x.Estabelecimento)
+                .Include(x => x.Atendimentos)
                 .ToListAsync();
         }
 
@@ -49,6 +51,7 @@ namespace Loja.Repository.Repositories
                 .Include(x => x.Servico)
                 .Include(x => x.Usuario)
                 .Include(x => x.Estabelecimento)
+                .Include(x => x.Atendimentos)
                 .FirstOrDefaultAsync();
         }
 

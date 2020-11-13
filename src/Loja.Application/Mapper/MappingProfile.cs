@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Loja.CrossCutting.Dto;
+using Loja.CrossCutting.Enumerators;
 using Loja.Domain.Entities;
 using System;
 using System.Globalization;
+using System.Linq;
 
 namespace Loja.Application.Mapper
 {
@@ -25,9 +27,11 @@ namespace Loja.Application.Mapper
                 .ForMember(d => d.DataFinalAgendamentoStr, dto => dto.MapFrom(s => s.DataFinalAgendamento.ToString("dd/MM/yyyy HH:mm")))
                 .ForMember(d => d.Situacao, dto => dto.MapFrom(s => s.Situacao.Nome))
                 .ForMember(d => d.ServicoNome, dto => dto.MapFrom(s => s.Servico.Nome))
+                .ForMember(d => d.ServicoValor, dto => dto.MapFrom(s => s.Servico.Valor.ToString("N2", CultureInfo.CurrentCulture)))
                 .ForMember(d => d.EstabelecimentoNome, dto => dto.MapFrom(s => s.Estabelecimento.Nome))
                 .ForMember(d => d.UsuarioNome, dto => dto.MapFrom(s => s.Usuario.Nome))
-                .ForMember(d => d.DataCadastro, dto => dto.MapFrom(s => s.DataCadastro.ToString("dd/MM/yyyy HH:mm")));
+                .ForMember(d => d.DataCadastro, dto => dto.MapFrom(s => s.DataCadastro.ToString("dd/MM/yyyy HH:mm")))
+                .ForMember(d => d.PossuiAtendimento, dto => dto.MapFrom(s => s.Atendimentos.Any(x => x.SituacaoId != (int)ESituacao.CANCELADO)));
             CreateMap<AgendamentoDto, Agendamento>()
                 .ForMember(d => d.DataAgendamento, dto => dto.MapFrom(s => DateTime.Parse(s.DataAgendamentoStr)))
                 .ForMember(d => d.DataFinalAgendamento, dto => dto.MapFrom(s => DateTime.Parse(s.DataFinalAgendamentoStr)));

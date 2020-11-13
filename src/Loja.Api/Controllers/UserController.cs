@@ -12,6 +12,7 @@ namespace Loja.Api.Controllers
 {
     [EnableCors("ApiCorsPolicy")]    
     [Route("api/users")]
+    [Authorize]
     public class UserController : Controller
     {
         private readonly UserService _userService;
@@ -21,6 +22,7 @@ namespace Loja.Api.Controllers
             _userService = userService;
         }
 
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpGet("clientes")]
         [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
         public async Task<ResultDto<IEnumerable<UserDto>>> GetAll(int estabelecimentoId)
@@ -28,6 +30,7 @@ namespace Loja.Api.Controllers
             return await _userService.ObterTodosClientes(estabelecimentoId);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
         public async Task<ResultDto<IEnumerable<UserDto>>> GetAll(int? estabelecimentoId)
@@ -35,13 +38,15 @@ namespace Loja.Api.Controllers
             return await _userService.ObterTodos(estabelecimentoId);
         }
 
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
         public async Task<ResultDto<UserDto>> Get(string id)
         {
             return await _userService.GetUserById(id);
-        }        
-        
+        }
+
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
         public async Task<ResultDto<UserDto>> Put(int id, [FromBody] UserDto userDto)
@@ -49,6 +54,7 @@ namespace Loja.Api.Controllers
             return await _userService.Update(userDto);
         }
 
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpPut]
         [Route("{id}/atualizar-senha")]
         [ProducesResponseType(typeof(ResultDto<bool>), 200)]
@@ -58,6 +64,7 @@ namespace Loja.Api.Controllers
         }
 
 
+        [Authorize(Roles = "Administrador")]
         [HttpPost("")]
         [ProducesResponseType(typeof(ResultDto<UserDto>), 200)]
         public async Task<ResultDto<UserDto>> Post([FromBody] UserDto userDto)
@@ -65,6 +72,7 @@ namespace Loja.Api.Controllers
             return await _userService.SalvarUsuario(userDto);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(ResultDto<bool>), 200)]
         public async Task<ResultDto<bool>> Delete(string id)

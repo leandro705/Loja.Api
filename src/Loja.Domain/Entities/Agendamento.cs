@@ -1,6 +1,7 @@
 ﻿using Loja.CrossCutting.Dto;
 using Loja.CrossCutting.Enumerators;
 using System;
+using System.Collections.Generic;
 
 namespace Loja.Domain.Entities
 {
@@ -23,6 +24,8 @@ namespace Loja.Domain.Entities
         
         public int SituacaoId { get; set; }
         public virtual Situacao Situacao { get; set; }
+
+        public virtual IEnumerable<Atendimento> Atendimentos{ get; set; }
 
         public void AtualizarAgendamento(AgendamentoDto agendamentoDto)
         {

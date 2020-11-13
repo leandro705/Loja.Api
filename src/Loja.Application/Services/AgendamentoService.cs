@@ -87,6 +87,10 @@ namespace Loja.Application.Services
         public async Task<ResultDto<bool>> Delete(int agendamentoId)
         {
             var agendamento = await _agendamentoRepository.ObterPorId(agendamentoId);
+
+            if (agendamento.Atendimentos.Any(x => x.SituacaoId != (int)ESituacao.CANCELADO))
+                return await Task.FromResult(ResultDto<bool>.Validation("Agendamento possui atendimentos vinculados!"));
+
             agendamento.DesabilitarAgendamento();
             await _agendamentoRepository.Update(agendamento);
             return await Task.FromResult(ResultDto<bool>.Success(true));

@@ -46,6 +46,8 @@ namespace Loja.Application
                 IsGoogle = userDto.IsGoogle,
                 IsFacebook = userDto.IsFacebook,
                 EstabelecimentoId = userDto.EstabelecimentoId,
+                EstabelecimentoNomeUrl = userDto.EstabelecimentoNomeUrl,
+                EstabelecimentoNome = userDto.EstabelecimentoNome,
                 IsAdministrador = userDto.Role == "Administrador"
             };
         }

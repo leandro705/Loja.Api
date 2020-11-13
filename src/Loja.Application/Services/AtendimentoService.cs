@@ -84,7 +84,15 @@ namespace Loja.Application.Services
             await _atendimentoRepository.Update(atendimento);
             return await Task.FromResult(ResultDto<bool>.Success(true));
         }
-        
+
+        public async Task<ResultDto<bool>> FinalizarAtendimento(int atendimentoId)
+        {
+            var atendimento = await _atendimentoRepository.ObterPorId(atendimentoId);
+            atendimento.FinalizarAtendimento();
+            await _atendimentoRepository.Update(atendimento);
+            return await Task.FromResult(ResultDto<bool>.Success(true));
+        }
+
         public async Task<ResultDto<int>> TotalAtendimentos(int? estabelecimentoId, string usuarioId, int? situacaoId)
         {
             var total = await _atendimentoRepository.ObterTotalAtendimentos(estabelecimentoId, usuarioId, situacaoId);

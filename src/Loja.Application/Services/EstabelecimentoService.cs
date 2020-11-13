@@ -20,8 +20,20 @@ namespace Loja.Application.Services
         {
             _estabelecimentoRepository = estabelecimentoRepository;
             _mapper = mapper;
-        }       
-    
+        }
+
+        public async Task<ResultDto<EstabelecimentoDto>> ObterPorUrl(string url)
+        {
+            var estabelecimentos = await _estabelecimentoRepository.ObterTodos(url);
+
+            if (!estabelecimentos.Any())
+                return await Task.FromResult(ResultDto<EstabelecimentoDto>.Validation("Estabelecimento não encontrado na base de dados!"));
+
+            var estabelecimentoDto = _mapper.Map<Estabelecimento, EstabelecimentoDto>(estabelecimentos.FirstOrDefault());
+
+            return await Task.FromResult(ResultDto<EstabelecimentoDto>.Success(estabelecimentoDto));
+        }
+
         public async Task<ResultDto<IEnumerable<EstabelecimentoDto>>> ObterTodos(string url)
         {
             var estabelecimentos = await _estabelecimentoRepository.ObterTodos(url);
@@ -29,7 +41,7 @@ namespace Loja.Application.Services
             if (!estabelecimentos.Any())
                 return await Task.FromResult(ResultDto<IEnumerable<EstabelecimentoDto>>.Validation("Estabelecimentos não encontrado na base de dados!"));
 
-            var estabelecimentoDto = _mapper.Map<IEnumerable<Estabelecimento>, IEnumerable<EstabelecimentoDto>>(estabelecimentos);          
+            var estabelecimentoDto = _mapper.Map<IEnumerable<Estabelecimento>, IEnumerable<EstabelecimentoDto>>(estabelecimentos);
 
             return await Task.FromResult(ResultDto<IEnumerable<EstabelecimentoDto>>.Success(estabelecimentoDto));
         }
