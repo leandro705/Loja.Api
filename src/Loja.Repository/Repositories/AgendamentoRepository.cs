@@ -63,5 +63,25 @@ namespace Loja.Repository.Repositories
 
             return await Task.FromResult(totalCadastrado);
         }
+
+        public async Task<IEnumerable<Agendamento>> ObterAgendamentosPorEstabelecimentoEData(DateTime dataAgendamento, int estabelecimentoId)
+        {
+            return await _context.Set<Agendamento>()
+                .Where(x => x.EstabelecimentoId == estabelecimentoId && x.SituacaoId == (int)ESituacao.ATIVO && x.DataAgendamento.Date == dataAgendamento.Date)
+                .Include(x => x.Servico)
+                .ToListAsync();
+        }
+
+        public async Task<bool> ValidaAgendamentoDuplicados(Agendamento agendamento)
+        {
+            return await _context.Set<Agendamento>()
+                .AnyAsync(x => 
+                    x.EstabelecimentoId == agendamento.EstabelecimentoId && x.SituacaoId == (int)ESituacao.ATIVO &&
+                    ((agendamento.AgendamentoId > 0 && x.AgendamentoId != agendamento.AgendamentoId) || agendamento.AgendamentoId == 0) &&
+                    ((agendamento.DataAgendamento >= x.DataAgendamento && agendamento.DataAgendamento < x.DataFinalAgendamento) || 
+                    (agendamento.DataFinalAgendamento > x.DataAgendamento && agendamento.DataFinalAgendamento <= x.DataFinalAgendamento))
+                );
+                
+        }
     }
 }

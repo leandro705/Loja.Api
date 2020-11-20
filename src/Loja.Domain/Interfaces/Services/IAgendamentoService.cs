@@ -14,5 +14,6 @@ namespace Loja.Domain.Interfaces.Services
         Task<ResultDto<bool>> Update(AgendamentoDto agendamentoDto);
         Task<ResultDto<bool>> Delete(int servicoId);
         Task<ResultDto<int>> TotalAgendamentos(int? estabelecimentoId, string usuarioId);
+        Task<ResultDto<IEnumerable<HorarioDisponivelDto>>> ObterHorariosDisponiveis(string dataAgendamento, int estabelecimentoId, int servicoId);
     }
 }

@@ -10,6 +10,8 @@ namespace Loja.Domain.Interfaces.Repository
         Task<IEnumerable<Agendamento>> ObterTodosCalendario(DateTime inicio, DateTime final, int? estabelecimentoId, string usuarioId);
         Task<IEnumerable<Agendamento>> ObterTodos(int? estabelecimentoId);
         Task<Agendamento> ObterPorId(int agendamentoId);
-        Task<int> ObterTotalAgendamentos(int? estabelecimentoId, string usuarioId);        
+        Task<int> ObterTotalAgendamentos(int? estabelecimentoId, string usuarioId);
+        Task<IEnumerable<Agendamento>> ObterAgendamentosPorEstabelecimentoEData(DateTime dataAgendamento, int estabelecimentoId);
+        Task<bool> ValidaAgendamentoDuplicados(Agendamento agendamento);
     }
 }

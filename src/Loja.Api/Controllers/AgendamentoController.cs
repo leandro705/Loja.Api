@@ -31,6 +31,14 @@ namespace Loja.Api.Controllers
             return await _agendamentoService.ObterTodosCalendario(inicio, final, estabelecimentoId, usuarioId);
         }
 
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
+        [HttpGet("horariosDisponiveis")]
+        [ProducesResponseType(typeof(ResultDto<IEnumerable<HorarioDisponivelDto>>), 200)]
+        public async Task<ResultDto<IEnumerable<HorarioDisponivelDto>>> ObterHorariosDisponiveis(string dataAgendamento, int estabelecimentoId, int servicoId)
+        {
+            return await _agendamentoService.ObterHorariosDisponiveis(dataAgendamento, estabelecimentoId, servicoId);
+        }
+
         [Authorize(Roles = "Administrador,Gerente")]
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<AgendamentoDto>>), 200)]

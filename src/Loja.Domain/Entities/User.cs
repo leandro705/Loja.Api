@@ -17,7 +17,7 @@ namespace Loja.Domain.Entities
             IsFacebook = userDto.IsFacebook;
             IsGoogle = userDto.IsGoogle;
             DataCadastro = DateTime.Now;
-            Endereco = new Endereco(userDto.Endereco);
+            Endereco = userDto.Endereco != null ? new Endereco(userDto.Endereco) : null;
         }
 
         public override string Id { get => base.Id; set => base.Id = value; }

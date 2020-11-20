@@ -15,11 +15,13 @@ namespace Loja.Application.Services
     public class AgendamentoService : IAgendamentoService
     {             
         private readonly IAgendamentoRepository _agendamentoRepository;
+        private readonly IServicoRepository _servicoRepository;
         private readonly IMapper _mapper;
 
-        public AgendamentoService(IAgendamentoRepository agendamentoRepository, IMapper mapper)
+        public AgendamentoService(IAgendamentoRepository agendamentoRepository, IServicoRepository servicoRepository, IMapper mapper)
         {
             _agendamentoRepository = agendamentoRepository;
+            _servicoRepository = servicoRepository;
             _mapper = mapper;
         }       
 
@@ -68,6 +70,10 @@ namespace Loja.Application.Services
             var agendamento = _mapper.Map<Agendamento>(agendamentoDto);
             agendamento.SituacaoId = (int)ESituacao.ATIVO;
             agendamento.DataCadastro = DateTime.Now;
+
+            if (await _agendamentoRepository.ValidaAgendamentoDuplicados(agendamento))
+                return await Task.FromResult(ResultDto<AgendamentoDto>.Validation("Horário já possui agendamento!"));
+
             await _agendamentoRepository.Create(agendamento);
             return await Task.FromResult(ResultDto<AgendamentoDto>.Success(_mapper.Map<AgendamentoDto>(agendamento)));
         }
@@ -80,6 +86,10 @@ namespace Loja.Application.Services
 
             var agendamento = await _agendamentoRepository.ObterPorId(agendamentoDto.AgendamentoId);
             agendamento.AtualizarAgendamento(agendamentoDto);
+
+            if (await _agendamentoRepository.ValidaAgendamentoDuplicados(agendamento))
+                return await Task.FromResult(ResultDto<bool>.Validation("Horário já possui agendamento!"));
+
             await _agendamentoRepository.Update(agendamento);
             return await Task.FromResult(ResultDto<bool>.Success(true));
         }
@@ -101,6 +111,39 @@ namespace Loja.Application.Services
             var totalCadastrado = await _agendamentoRepository.ObterTotalAgendamentos(estabelecimentoId, usuarioId);
 
             return await Task.FromResult(ResultDto<int>.Success(totalCadastrado));
-        }        
+        }
+
+        public async Task<ResultDto<IEnumerable<HorarioDisponivelDto>>> ObterHorariosDisponiveis(string dataAgendamentoStr, int estabelecimentoId, int servicoId)
+        {
+            var dataAgendamento = DateTime.Parse(dataAgendamentoStr);
+            var agendamentos = await _agendamentoRepository.ObterAgendamentosPorEstabelecimentoEData(dataAgendamento, estabelecimentoId);
+            var servico = await _servicoRepository.ObterPorId(servicoId);
+            var dataHoraInicial = new DateTime(dataAgendamento.Year, dataAgendamento.Month, dataAgendamento.Day, 5, 0, 0);
+            var dataHoraFinal = new DateTime(dataAgendamento.Year, dataAgendamento.Month, dataAgendamento.Day, 22, 0, 0);
+            var horarios = new List<HorarioDisponivelDto>();
+            while (dataHoraInicial < dataHoraFinal)
+            {
+                var dataHoraDuracao = dataHoraInicial.AddMinutes(servico.Duracao);
+
+                var agendamento = agendamentos.FirstOrDefault(x => (dataHoraInicial >= x.DataAgendamento && dataHoraInicial < x.DataFinalAgendamento) || 
+                                                                    (dataHoraDuracao > x.DataAgendamento && dataHoraDuracao <= x.DataFinalAgendamento));
+                if (agendamento == null)
+                {
+                    var horarioDisponivelDto = new HorarioDisponivelDto() { 
+                        DataAgendamento = dataHoraInicial,
+                        DataAgendamentoStr = dataHoraInicial.ToString("dd/MM/yyyy HH:mm"),
+                        HorarioInicial = dataHoraInicial.ToString("HH:mm"),
+                        HorarioFinal = dataHoraDuracao.ToString("HH:mm")
+                    };
+
+                    horarios.Add(horarioDisponivelDto);
+                    dataHoraInicial = dataHoraDuracao;
+                }
+                else
+                    dataHoraInicial = agendamento.DataFinalAgendamento;
+            }
+
+            return await Task.FromResult(ResultDto<IEnumerable<HorarioDisponivelDto>>.Success(horarios));
+        }
     }
 }

@@ -21,7 +21,7 @@ namespace Loja.CrossCutting.Dto
         public string Situacao { get; set; }
         public int EstabelecimentoId { get; set; }
         public string EstabelecimentoNome { get; set; }
-        public int AgendamentoId { get; set; }
+        public int? AgendamentoId { get; set; }
         public IEnumerable<AtendimentoItemDto> AtendimentoItens { get; set; }
     }
 }
