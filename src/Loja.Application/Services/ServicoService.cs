@@ -33,7 +33,19 @@ namespace Loja.Application.Services
             var servicoDto = _mapper.Map<IEnumerable<Servico>, IEnumerable<ServicoDto>>(servicos);          
 
             return await Task.FromResult(ResultDto<IEnumerable<ServicoDto>>.Success(servicoDto));
-        }       
+        }
+
+        public async Task<ResultDto<IEnumerable<ServicoDto>>> ObterTodosAtivos(int? estabelecimentoId)
+        {
+            var servicos = await _servicoRepository.ObterTodosAtivos(estabelecimentoId);
+
+            if (!servicos.Any())
+                return ResultDto<IEnumerable<ServicoDto>>.Validation("Serviços não encontrado na base de dados!");
+
+            var servicoDto = _mapper.Map<IEnumerable<Servico>, IEnumerable<ServicoDto>>(servicos);
+
+            return await Task.FromResult(ResultDto<IEnumerable<ServicoDto>>.Success(servicoDto));
+        }
 
         public async Task<ResultDto<ServicoDto>> ObterPorId(int servicoId)
         {
@@ -73,6 +85,22 @@ namespace Loja.Application.Services
         }
 
         public async Task<ResultDto<bool>> Delete(int servicoId)
+        {
+            var servico = await _servicoRepository.ObterPorId(servicoId);
+            servico.CancelarServico();
+            await _servicoRepository.Update(servico);
+            return await Task.FromResult(ResultDto<bool>.Success(true));
+        }
+
+        public async Task<ResultDto<bool>> Ativar(int servicoId)
+        {
+            var servico = await _servicoRepository.ObterPorId(servicoId);
+            servico.AtivarServico();
+            await _servicoRepository.Update(servico);
+            return await Task.FromResult(ResultDto<bool>.Success(true));
+        }
+
+        public async Task<ResultDto<bool>> Desativar(int servicoId)
         {
             var servico = await _servicoRepository.ObterPorId(servicoId);
             servico.DesabilitarServico();

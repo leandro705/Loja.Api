@@ -19,6 +19,16 @@ namespace Loja.Repository.Repositories
         {
             return await _context.Set<Servico>()
                 .Where(x => (!estabelecimentoId.HasValue || x.EstabelecimentoId == estabelecimentoId))
+                .Where(x => x.SituacaoId != (int)ESituacao.CANCELADO)
+                .Include(x => x.Situacao)
+                .Include(x => x.Estabelecimento)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Servico>> ObterTodosAtivos(int? estabelecimentoId)
+        {
+            return await _context.Set<Servico>()
+                .Where(x => (!estabelecimentoId.HasValue || x.EstabelecimentoId == estabelecimentoId))
                 .Where(x => x.SituacaoId == (int)ESituacao.ATIVO)
                 .Include(x => x.Situacao)
                 .Include(x => x.Estabelecimento)

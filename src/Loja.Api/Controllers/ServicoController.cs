@@ -24,6 +24,14 @@ namespace Loja.Api.Controllers
         }
 
         [Authorize(Roles = "Administrador,Gerente,Cliente")]
+        [HttpGet("ativo")]
+        [ProducesResponseType(typeof(ResultDto<IEnumerable<ServicoDto>>), 200)]
+        public async Task<ResultDto<IEnumerable<ServicoDto>>> GetAllAtivos(int? estabelecimentoId)
+        {
+            return await _servicoService.ObterTodosAtivos(estabelecimentoId);
+        }
+
+        [Authorize(Roles = "Administrador,Gerente")]
         [HttpGet("")]
         [ProducesResponseType(typeof(ResultDto<IEnumerable<ServicoDto>>), 200)]
         public async Task<ResultDto<IEnumerable<ServicoDto>>> GetAll(int? estabelecimentoId)
@@ -61,6 +69,22 @@ namespace Loja.Api.Controllers
         public async Task<ResultDto<bool>> Delete(int id)
         {
             return await _servicoService.Delete(id);
+        }
+
+        [Authorize(Roles = "Administrador,Gerente")]
+        [HttpPut("{id}/ativar")]
+        [ProducesResponseType(typeof(ResultDto<bool>), 200)]
+        public async Task<ResultDto<bool>> Ativar(int id)
+        {
+            return await _servicoService.Ativar(id);
+        }
+
+        [Authorize(Roles = "Administrador,Gerente")]
+        [HttpPut("{id}/desativar")]
+        [ProducesResponseType(typeof(ResultDto<bool>), 200)]
+        public async Task<ResultDto<bool>> Desativar(int id)
+        {
+            return await _servicoService.Desativar(id);
         }
     }
 }

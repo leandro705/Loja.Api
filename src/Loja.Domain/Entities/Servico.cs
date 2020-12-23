@@ -25,9 +25,19 @@ namespace Loja.Domain.Entities
             EstabelecimentoId = servicoDto.EstabelecimentoId;
         }
 
-        public void DesabilitarServico()
+        public void CancelarServico()
         {
             SituacaoId = (int)ESituacao.CANCELADO;
+        }
+
+        public void AtivarServico()
+        {
+            SituacaoId = (int)ESituacao.ATIVO;
+        }
+
+        public void DesabilitarServico()
+        {
+            SituacaoId = (int)ESituacao.INATIVO;
         }
     }
 }

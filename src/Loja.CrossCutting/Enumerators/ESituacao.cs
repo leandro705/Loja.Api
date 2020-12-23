@@ -14,7 +14,10 @@ namespace Loja.CrossCutting.Enumerators
         FINALIZADO = 3,
 
         [Description("Cancelado")]
-        CANCELADO = 4
+        CANCELADO = 4,
+
+        [Description("Inativo")]
+        INATIVO = 5
 
     }
 }

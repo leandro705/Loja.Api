@@ -39,7 +39,7 @@ namespace Loja.Api.Controllers
             return await _estabelecimentoService.ObterTodos(url);
         }
 
-        [Authorize(Roles = "Administrador,Gerente")]
+        [Authorize(Roles = "Administrador,Gerente,Cliente")]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ResultDto<EstabelecimentoDto>), 200)]
         public async Task<ResultDto<EstabelecimentoDto>> Get(int id)

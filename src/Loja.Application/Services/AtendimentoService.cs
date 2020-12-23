@@ -101,19 +101,21 @@ namespace Loja.Application.Services
         }
 
         public async Task<ResultDto<List<TotalizadorMesDto>>> TotalAtendimentosMes(int? estabelecimentoId, string usuarioId, int? situacaoId)
-        {
-            var ano = DateTime.Now.Year;
-
-            var meses = Enum.GetValues(typeof(EMeses)).Cast<EMeses>().ToList();
+        {            
+            var dataInicial = DateTime.Now.AddYears(-1);                                    
             var totalizadorMesDto = new List<TotalizadorMesDto>();
-            foreach (var mes in meses)
+            for (int i = 0; i < 12; i++)            
             {
+                var mes = dataInicial.Month;
+                var ano = dataInicial.Year;
                 totalizadorMesDto.Add(new TotalizadorMesDto()
                 {
-                    Total = await _atendimentoRepository.ObterTotalAtendimentosMes(estabelecimentoId, usuarioId, situacaoId, (int)mes, ano),
-                    Mes = mes.GetDescription(),
+                    Total = await _atendimentoRepository.ObterTotalAtendimentosMes(estabelecimentoId, usuarioId, situacaoId, mes, ano),
+                    Mes = ((EMeses)mes).GetDescription(),
                     Ano = ano
                 });
+
+                dataInicial = dataInicial.AddMonths(1);
             }
        
             return await Task.FromResult(ResultDto<List<TotalizadorMesDto>>.Success(totalizadorMesDto));
