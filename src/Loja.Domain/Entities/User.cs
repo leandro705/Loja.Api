@@ -29,7 +29,7 @@ namespace Loja.Domain.Entities
         public bool IsFacebook { get; set; }
         public int? EnderecoId { get; set; }
         public virtual Endereco Endereco { get; set; }
-        public virtual IEnumerable<UserEstabelecimento> UserEstabelecimentos { get; set; } = new List<UserEstabelecimento>();
+        public virtual List<UserEstabelecimento> UserEstabelecimentos { get; set; } = new List<UserEstabelecimento>();
         public virtual IEnumerable<Agendamento> Agendamentos { get; set; } = new List<Agendamento>();
 
         public void AtualizarUsuario(UserDto userDto)
@@ -47,6 +47,11 @@ namespace Loja.Domain.Entities
         public void VincularEstabelecimento(List<UserEstabelecimento> userEstabelecimentos)
         {
             UserEstabelecimentos = userEstabelecimentos;
+        }
+
+        public void AdicionarEstabelecimento(UserEstabelecimento userEstabelecimento)
+        {
+            UserEstabelecimentos.Add(userEstabelecimento);
         }
     }
 }

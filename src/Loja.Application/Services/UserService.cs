@@ -130,7 +130,14 @@ namespace Loja.Application.Services
                 var applicationUser = await GetUserByEmail(authDto.Email);
 
                 if (!applicationUser.Estabelecimentos.Any(x => x.EstabelecimentoId == authDto.EstabelecimentoId))
-                    return ResultDto<AuthenticatedDto>.Validation("Usuário não vinculado ao estabalecimento!");
+                {
+                    var user = await _userManager.Users?.FirstOrDefaultAsync(u => u.Id == applicationUser.Id);
+                    var userEstabelecimento = new UserEstabelecimento() { EstabelecimentoId = authDto.EstabelecimentoId };
+                    user.AdicionarEstabelecimento(userEstabelecimento); 
+                    await _userManager.UpdateAsync(user);
+
+                    applicationUser = await GetUserByEmail(authDto.Email);
+                }                    
 
                 userDto = new UserDto
                 {
