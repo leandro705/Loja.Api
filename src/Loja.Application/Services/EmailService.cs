@@ -14,10 +14,10 @@ namespace Loja.Application.Services
             _sendApiKey = configuration["SendGrid:SmtpApiKey"];
         }
 
-        public async void Send(string toAddress, string subject, string body, bool sendAsync = true)
+        public async void Send(string toAddress, string subject, string nomeLoja, string body, bool sendAsync = true)
         {            
             var client = new SendGridClient(_sendApiKey);
-            var from = new EmailAddress("leandro_705@hotmail.com", "Contato - Loja");
+            var from = new EmailAddress("leandro_705@hotmail.com", "Contato - " + nomeLoja);
             var to = new EmailAddress(toAddress, toAddress);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, "", body);
             await client.SendEmailAsync(msg).ConfigureAwait(false);

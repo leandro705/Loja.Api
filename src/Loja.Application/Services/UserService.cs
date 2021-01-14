@@ -137,19 +137,34 @@ namespace Loja.Application.Services
                     await _userManager.UpdateAsync(user);
 
                     applicationUser = await GetUserByEmail(authDto.Email);
-                }                    
+                    userDto = new UserDto
+                    {
+                        Id = applicationUser.Id,
+                        Nome = applicationUser.Nome,
+                        Email = applicationUser.Email,
+                        Role = applicationUser.Role,
+                        Claims = applicationUser.Claims,
+                        EstabelecimentoId = authDto.EstabelecimentoId,
+                        EstabelecimentoNomeUrl = applicationUser.Estabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == authDto.EstabelecimentoId).Url,
+                        EstabelecimentoNome = applicationUser.Estabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == authDto.EstabelecimentoId).Nome
+                    };
 
-                userDto = new UserDto
+                    _emailService.Send(userDto.Email, "Confirmação de cadastro", userDto.EstabelecimentoNome, EmailTemplate.ConfirmacaoCadastro(_configuration, userDto));
+                }  
+                else
                 {
-                    Id = applicationUser.Id,
-                    Nome = applicationUser.Nome,
-                    Email = applicationUser.Email,
-                    Role = applicationUser.Role,
-                    Claims = applicationUser.Claims,
-                    EstabelecimentoId = authDto.EstabelecimentoId,
-                    EstabelecimentoNomeUrl = applicationUser.Estabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == authDto.EstabelecimentoId).Url,
-                    EstabelecimentoNome = applicationUser.Estabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == authDto.EstabelecimentoId).Nome
-                };
+                    userDto = new UserDto
+                    {
+                        Id = applicationUser.Id,
+                        Nome = applicationUser.Nome,
+                        Email = applicationUser.Email,
+                        Role = applicationUser.Role,
+                        Claims = applicationUser.Claims,
+                        EstabelecimentoId = authDto.EstabelecimentoId,
+                        EstabelecimentoNomeUrl = applicationUser.Estabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == authDto.EstabelecimentoId).Url,
+                        EstabelecimentoNome = applicationUser.Estabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == authDto.EstabelecimentoId).Nome
+                    };
+                }              
             }
 
             return ResultDto<AuthenticatedDto>.Success(TokenWrite.WriteToken(userDto, _tokenConfigurations, _signingConfigurations));
@@ -227,10 +242,13 @@ namespace Loja.Application.Services
                     .Include(x => x.UserEstabelecimentos)
                     .ThenInclude(x => x.Estabelecimento)
                     .FirstOrDefaultAsync(u => u.Id == userDto.Id);
+                var estabelecimento = userDB.UserEstabelecimentos.FirstOrDefault().Estabelecimento;
 
-                userDto.EstabelecimentoNomeUrl = userDB.UserEstabelecimentos.FirstOrDefault().Estabelecimento.Url;
+                userDto.EstabelecimentoNomeUrl = estabelecimento.Url;
+                userDto.EstabelecimentoNome = estabelecimento.Nome;
+
                 await _userManager.AddToRoleAsync(userDB, userDto.Role);
-                _emailService.Send(userDto.Email, "Confirmação de cadastro", EmailTemplate.ConfirmacaoCadastro(_configuration, userDto));
+                _emailService.Send(userDto.Email, "Confirmação de cadastro", userDto.EstabelecimentoNome, EmailTemplate.ConfirmacaoCadastro(_configuration, userDto));
             }
 
             return await Task.FromResult(ResultDto<UserDto>.Success(userDto));
@@ -242,7 +260,7 @@ namespace Loja.Application.Services
             var result = await Salvar(userDto);
 
             if(result.StatusCode == 200)
-                _emailService.Send(userDto.Email, "Confirmação de cadastro", EmailTemplate.ConfirmacaoCadastro(_configuration, result.Data));
+                _emailService.Send(userDto.Email, "Confirmação de cadastro", result.Data.EstabelecimentoNome, EmailTemplate.ConfirmacaoCadastro(_configuration, result.Data));
             
             return await Task.FromResult(result);
         }
@@ -274,8 +292,11 @@ namespace Loja.Application.Services
                     .Include(x => x.UserEstabelecimentos)
                     .ThenInclude(x => x.Estabelecimento)
                     .FirstOrDefaultAsync(u => u.Id == userDto.Id);
-                
-                userDto.EstabelecimentoNomeUrl = userDB.UserEstabelecimentos.FirstOrDefault().Estabelecimento.Url;
+
+                var estabelecimento = userDB.UserEstabelecimentos.FirstOrDefault().Estabelecimento;
+                userDto.EstabelecimentoNomeUrl = estabelecimento.Url;
+                userDto.EstabelecimentoNome = estabelecimento.Nome;
+
                 await _userManager.AddToRoleAsync(userDB, userDto.Role);
             }                
 
@@ -334,7 +355,7 @@ namespace Loja.Application.Services
 
             var userEstabelecimento = user.UserEstabelecimentos.FirstOrDefault(x => x.EstabelecimentoId == estabelecimentoId);
             var token = await GerarToken(user);
-            _emailService.Send(user.Email, "Alteração de senha", EmailTemplate.RecuperarSenha(_configuration, user, token, userEstabelecimento?.Estabelecimento?.Url));
+            _emailService.Send(user.Email, "Alteração de senha", userEstabelecimento?.Estabelecimento?.Nome, EmailTemplate.RecuperarSenha(_configuration, user, token, userEstabelecimento?.Estabelecimento?.Url));
             return ResultDto<bool>.Success(true);
         }
 
