@@ -40,6 +40,7 @@ namespace Loja.Repository.Repositories
             return await _context.Set<Servico>()
                 .Where(x => x.ServicoId == servicoId)
                 .Include(x => x.Situacao)
+                .Include(x => x.Estabelecimento)
                 .FirstOrDefaultAsync();
         }
     }

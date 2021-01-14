@@ -29,6 +29,8 @@ namespace Loja.Repository.Repositories
             return await _context.Set<Atendimento>()
                 .Where(x => x.AtendimentoId == atendimentoId)
                 .Include(x => x.Situacao)
+                .Include(x => x.Usuario)
+                .Include(x => x.Estabelecimento)
                 .Include(x => x.AtendimentoItens)
                     .ThenInclude(x => x.Servico)
                 .FirstOrDefaultAsync();

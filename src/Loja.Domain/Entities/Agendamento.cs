@@ -37,6 +37,11 @@ namespace Loja.Domain.Entities
             EstabelecimentoId = agendamentoDto.EstabelecimentoId;
         }
 
+        public void FinalizarAgendamento()
+        {
+            SituacaoId = (int)ESituacao.FINALIZADO;
+        }
+
         public void DesabilitarAgendamento()
         {
             SituacaoId = (int)ESituacao.CANCELADO;

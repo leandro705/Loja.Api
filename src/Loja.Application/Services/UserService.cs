@@ -300,7 +300,8 @@ namespace Loja.Application.Services
         {
             var user = await _userManager.Users?
                 .Include(x => x.Endereco)
-                    .ThenInclude(x => x.Municipio)                
+                    .ThenInclude(x => x.Municipio)
+                        .ThenInclude(x => x.Estado)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)

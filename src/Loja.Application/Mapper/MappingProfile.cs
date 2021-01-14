@@ -66,7 +66,9 @@ namespace Loja.Application.Mapper
             CreateMap<ServicoDto, Servico>();
 
             CreateMap<Endereco, EnderecoDto>()
-                .ForMember(d => d.EstadoId, dto => dto.MapFrom(s => s.Municipio.EstadoId));
+                .ForMember(d => d.EstadoId, dto => dto.MapFrom(s => s.Municipio.EstadoId))
+                .ForMember(d => d.EstadoNome, dto => dto.MapFrom(s => s.Municipio.Estado.Nome))
+                .ForMember(d => d.MunicipioNome, dto => dto.MapFrom(s => s.Municipio.Nome));
             CreateMap<EnderecoDto, Endereco>();                
 
         }

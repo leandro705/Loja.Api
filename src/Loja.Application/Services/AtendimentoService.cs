@@ -16,11 +16,13 @@ namespace Loja.Application.Services
     public class AtendimentoService : IAtendimentoService
     {             
         private readonly IAtendimentoRepository _atendimentoRepository;
+        private readonly IAgendamentoRepository _agendamentoRepository;
         private readonly IMapper _mapper;
 
-        public AtendimentoService(IAtendimentoRepository atendimentoRepository, IMapper mapper)
+        public AtendimentoService(IAtendimentoRepository atendimentoRepository, IAgendamentoRepository agendamentoRepository, IMapper mapper)
         {
             _atendimentoRepository = atendimentoRepository;
+            _agendamentoRepository = agendamentoRepository;
             _mapper = mapper;
         }
 
@@ -58,6 +60,14 @@ namespace Loja.Application.Services
             atendimento.SituacaoId = (int)ESituacao.PENDENTE;
             atendimento.DataCadastro = DateTime.Now;
             await _atendimentoRepository.Create(atendimento);
+
+            if (atendimentoDto.AgendamentoId.HasValue)
+            {
+                var agendamento = await _agendamentoRepository.ObterPorId(atendimentoDto.AgendamentoId.Value);
+                agendamento.FinalizarAgendamento();
+                await _agendamentoRepository.Update(agendamento);
+            }
+
             return await Task.FromResult(ResultDto<AtendimentoDto>.Success(_mapper.Map<AtendimentoDto>(atendimento)));
         }
 

@@ -9,6 +9,8 @@
         public string Bairro { get; set; }
         public string Complemento { get; set; }
         public int MunicipioId { get; set; }
+        public string MunicipioNome { get; set; }
         public int EstadoId { get; set; }
+        public string EstadoNome { get; set; }
     }
 }
