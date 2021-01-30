@@ -90,7 +90,7 @@ namespace Loja.Application.Services
         public async Task<ResultDto<bool>> Delete(int atendimentoId)
         {
             var atendimento = await _atendimentoRepository.ObterPorId(atendimentoId);
-            atendimento.DesabilitarAtendimento();
+            atendimento.CancelarAtendimento();
             await _atendimentoRepository.Update(atendimento);
             return await Task.FromResult(ResultDto<bool>.Success(true));
         }

@@ -12,6 +12,6 @@ namespace Loja.Domain.Interfaces.Repository
         Task<Agendamento> ObterPorId(int agendamentoId);
         Task<int> ObterTotalAgendamentos(int? estabelecimentoId, string usuarioId);
         Task<IEnumerable<Agendamento>> ObterAgendamentosPorEstabelecimentoEData(DateTime dataAgendamento, int estabelecimentoId);
-        Task<bool> ValidaAgendamentoDuplicados(Agendamento agendamento);
+        Task<bool> ValidaAgendamentoDuplicados(int estabelecimentoId, int agendamentoId, DateTime dataAgendamento, DateTime dataFinalAgendamento);
     }
 }

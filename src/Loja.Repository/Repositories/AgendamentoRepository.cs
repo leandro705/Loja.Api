@@ -71,16 +71,13 @@ namespace Loja.Repository.Repositories
                 .ToListAsync();
         }
 
-        public async Task<bool> ValidaAgendamentoDuplicados(Agendamento agendamento)
+        public async Task<bool> ValidaAgendamentoDuplicados(int estabelecimentoId, int agendamentoId, DateTime dataAgendamento, DateTime dataFinalAgendamento)
         {
-            return await _context.Set<Agendamento>()
-                .AnyAsync(x => 
-                    x.EstabelecimentoId == agendamento.EstabelecimentoId && x.SituacaoId != (int)ESituacao.CANCELADO &&
-                    ((agendamento.AgendamentoId > 0 && x.AgendamentoId != agendamento.AgendamentoId) || agendamento.AgendamentoId == 0) &&
-                    ((agendamento.DataAgendamento >= x.DataAgendamento && agendamento.DataAgendamento < x.DataFinalAgendamento) || 
-                    (agendamento.DataFinalAgendamento > x.DataAgendamento && agendamento.DataFinalAgendamento <= x.DataFinalAgendamento))
-                );
-                
-        }
+            var result = _context.Set<Agendamento>()
+                .AsEnumerable()
+                .Where(agendamento => agendamento.VerificaAgendamentoDuplicado(estabelecimentoId, agendamentoId, dataAgendamento, dataFinalAgendamento));
+
+            return await Task.FromResult(result.Any()); 
+        }        
     }
 }

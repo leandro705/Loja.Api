@@ -25,7 +25,7 @@ namespace Loja.Domain.Entities
         public int SituacaoId { get; set; }
         public virtual Situacao Situacao { get; set; }
 
-        public virtual IEnumerable<Atendimento> Atendimentos{ get; set; }
+        public virtual IEnumerable<Atendimento> Atendimentos{ get; set; } = new List<Atendimento>();
 
         public void AtualizarAgendamento(AgendamentoDto agendamentoDto)
         {
@@ -42,9 +42,18 @@ namespace Loja.Domain.Entities
             SituacaoId = (int)ESituacao.FINALIZADO;
         }
 
-        public void DesabilitarAgendamento()
+        public void CancelarAgendamento()
         {
             SituacaoId = (int)ESituacao.CANCELADO;
+        }
+
+        public bool VerificaAgendamentoDuplicado(int estabelecimentoId, int agendamentoId, DateTime dataAgendamento, DateTime dataFinalAgendamento)
+        {
+            return EstabelecimentoId == estabelecimentoId && SituacaoId != (int)ESituacao.CANCELADO &&
+                    ((agendamentoId > 0 && AgendamentoId != agendamentoId) || agendamentoId == 0) &&
+                    ((dataAgendamento >= DataAgendamento && dataAgendamento < DataFinalAgendamento) ||
+                    (dataFinalAgendamento > DataAgendamento && dataFinalAgendamento <= DataFinalAgendamento));
+
         }
     }
 }

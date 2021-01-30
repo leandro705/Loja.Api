@@ -8,6 +8,7 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Loja.Application.Validators;
 
 namespace Loja.Application.Services
 {
@@ -60,6 +61,10 @@ namespace Loja.Application.Services
 
         public async Task<ResultDto<EstabelecimentoDto>> Create(EstabelecimentoDto estabelecimentoDto)
         {
+            var estabelecimentoDtoValidate = new EstabelecimentoDtoValidate(estabelecimentoDto);
+            if (!estabelecimentoDtoValidate.Validate())
+                return await Task.FromResult(ResultDto<EstabelecimentoDto>.Validation(estabelecimentoDtoValidate.Mensagens));
+
             var estabelecimento = _mapper.Map<Estabelecimento>(estabelecimentoDto);            
             estabelecimento.SituacaoId = (int)ESituacao.ATIVO;
             estabelecimento.DataCadastro = DateTime.Now;
@@ -69,6 +74,10 @@ namespace Loja.Application.Services
 
         public async Task<ResultDto<bool>> Update(EstabelecimentoDto estabelecimentoDto)
         {
+            var estabelecimentoDtoValidate = new EstabelecimentoDtoValidate(estabelecimentoDto);
+            if (!estabelecimentoDtoValidate.Validate())
+                return await Task.FromResult(ResultDto<bool>.Validation(estabelecimentoDtoValidate.Mensagens));
+
             var estabelecimento = await _estabelecimentoRepository.ObterPorId(estabelecimentoDto.EstabelecimentoId);
             estabelecimento.AtualizarEstabelecimento(estabelecimentoDto);
             await _estabelecimentoRepository.Update(estabelecimento);
@@ -78,7 +87,7 @@ namespace Loja.Application.Services
         public async Task<ResultDto<bool>> Delete(int estabelecimentoId)
         {
             var estabelecimento = await _estabelecimentoRepository.ObterPorId(estabelecimentoId);
-            estabelecimento.DesabilitarEstabelecimento();
+            estabelecimento.CancelarEstabelecimento();
             await _estabelecimentoRepository.Update(estabelecimento);
             return await Task.FromResult(ResultDto<bool>.Success(true));
         }

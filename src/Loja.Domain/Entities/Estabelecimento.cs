@@ -35,7 +35,7 @@ namespace Loja.Domain.Entities
             Facebook = estabelecimentoDto.Facebook;
         }
 
-        public void DesabilitarEstabelecimento()
+        public void CancelarEstabelecimento()
         {
             SituacaoId = (int)ESituacao.CANCELADO;
         }

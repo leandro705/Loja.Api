@@ -13,5 +13,6 @@
         public string Facebook { get; set; }
         public string DataCadastro { get; set; }
         public string Situacao { get; set; }
+        public int SituacaoId { get; set; }
     }
 }

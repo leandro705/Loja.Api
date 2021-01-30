@@ -6,7 +6,7 @@ namespace Loja.CrossCutting.Dto
     {
         public int StatusCode { get; }
         public TResult Data { get; }
-        public ICollection<string> Errors { get; }
+        public ICollection<string> Errors { get; } = new List<string>();
 
         protected ResultDto(int statusCode, TResult data)
         {

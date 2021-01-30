@@ -1,5 +1,4 @@
-﻿using Loja.CrossCutting.Enumerators;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Loja.CrossCutting.Dto
 {
@@ -18,10 +17,11 @@ namespace Loja.CrossCutting.Dto
         public string UsuarioNome { get; set; }
 
         public string DataCadastro { get; set; }
+        public int SituacaoId { get; set; }
         public string Situacao { get; set; }
         public int EstabelecimentoId { get; set; }
         public string EstabelecimentoNome { get; set; }
         public int? AgendamentoId { get; set; }
-        public IEnumerable<AtendimentoItemDto> AtendimentoItens { get; set; }
+        public IEnumerable<AtendimentoItemDto> AtendimentoItens { get; set; } = new List<AtendimentoItemDto>();
     }
 }

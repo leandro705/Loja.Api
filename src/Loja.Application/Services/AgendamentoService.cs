@@ -71,7 +71,7 @@ namespace Loja.Application.Services
             agendamento.SituacaoId = (int)ESituacao.ATIVO;
             agendamento.DataCadastro = DateTime.Now;
 
-            if (await _agendamentoRepository.ValidaAgendamentoDuplicados(agendamento))
+            if (await _agendamentoRepository.ValidaAgendamentoDuplicados(agendamento.EstabelecimentoId, agendamento.AgendamentoId, agendamento.DataAgendamento, agendamento.DataFinalAgendamento))
                 return await Task.FromResult(ResultDto<AgendamentoDto>.Validation("Horário já possui agendamento!"));
 
             await _agendamentoRepository.Create(agendamento);
@@ -87,7 +87,7 @@ namespace Loja.Application.Services
             var agendamento = await _agendamentoRepository.ObterPorId(agendamentoDto.AgendamentoId);
             agendamento.AtualizarAgendamento(agendamentoDto);
 
-            if (await _agendamentoRepository.ValidaAgendamentoDuplicados(agendamento))
+            if (await _agendamentoRepository.ValidaAgendamentoDuplicados(agendamento.EstabelecimentoId, agendamento.AgendamentoId, agendamento.DataAgendamento, agendamento.DataFinalAgendamento))
                 return await Task.FromResult(ResultDto<bool>.Validation("Horário já possui agendamento!"));
 
             await _agendamentoRepository.Update(agendamento);
@@ -101,7 +101,7 @@ namespace Loja.Application.Services
             if (agendamento.Atendimentos.Any(x => x.SituacaoId != (int)ESituacao.CANCELADO))
                 return await Task.FromResult(ResultDto<bool>.Validation("Agendamento possui atendimentos vinculados!"));
 
-            agendamento.DesabilitarAgendamento();
+            agendamento.CancelarAgendamento();
             await _agendamentoRepository.Update(agendamento);
             return await Task.FromResult(ResultDto<bool>.Success(true));
         }

@@ -8,6 +8,7 @@
         public int Duracao { get; set; }
         public string ValorFormatado { get; set; }
         public string DataCadastro { get; set; }
+        public int SituacaoId { get; set; }
         public string Situacao { get; set; }
         public int EstabelecimentoId { get; set; }
         public string EstabelecimentoNome { get; set; }        

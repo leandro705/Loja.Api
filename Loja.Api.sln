@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loja.Repository", "src\Loja
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loja.Domain", "src\Loja.Domain\Loja.Domain.csproj", "{0FEC4611-F291-411A-AB43-D2E69658CFEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loja.Configuration", "src\Loja.Configuration\Loja.Configuration.csproj", "{82B9ECB3-26FA-49E9-8C23-3A4633813FBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loja.Configuration", "src\Loja.Configuration\Loja.Configuration.csproj", "{82B9ECB3-26FA-49E9-8C23-3A4633813FBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loja.Test", "test\Loja.Test\Loja.Test.csproj", "{CFF5353A-F3FA-4ACE-A3F3-E57A367A0565}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +51,10 @@ Global
 		{82B9ECB3-26FA-49E9-8C23-3A4633813FBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82B9ECB3-26FA-49E9-8C23-3A4633813FBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82B9ECB3-26FA-49E9-8C23-3A4633813FBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFF5353A-F3FA-4ACE-A3F3-E57A367A0565}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFF5353A-F3FA-4ACE-A3F3-E57A367A0565}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFF5353A-F3FA-4ACE-A3F3-E57A367A0565}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFF5353A-F3FA-4ACE-A3F3-E57A367A0565}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{BD60EBE5-08AA-414F-9F54-42E6D7438FD6} = {15D2F8DF-CA79-40A3-B12B-7CC5A27ACCA4}
 		{0FEC4611-F291-411A-AB43-D2E69658CFEB} = {15D2F8DF-CA79-40A3-B12B-7CC5A27ACCA4}
 		{82B9ECB3-26FA-49E9-8C23-3A4633813FBD} = {15D2F8DF-CA79-40A3-B12B-7CC5A27ACCA4}
+		{CFF5353A-F3FA-4ACE-A3F3-E57A367A0565} = {F17EDA57-051D-4043-9449-C6E3E79CF570}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8349CE09-25D0-4DB8-AD4A-950AAB21A672}

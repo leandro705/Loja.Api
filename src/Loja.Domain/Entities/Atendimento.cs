@@ -42,7 +42,7 @@ namespace Loja.Domain.Entities
             AtendimentoItens = atendimentoItens;
         }
 
-        public void DesabilitarAtendimento()
+        public void CancelarAtendimento()
         {
             SituacaoId = (int)ESituacao.CANCELADO;
         }
