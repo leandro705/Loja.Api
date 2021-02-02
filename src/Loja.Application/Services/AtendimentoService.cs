@@ -114,7 +114,7 @@ namespace Loja.Application.Services
         {            
             var dataInicial = DateTime.Now.AddYears(-1);                                    
             var totalizadorMesDto = new List<TotalizadorMesDto>();
-            for (int i = 0; i < 12; i++)            
+            for (int i = 0; i < 13; i++)            
             {
                 var mes = dataInicial.Month;
                 var ano = dataInicial.Year;
