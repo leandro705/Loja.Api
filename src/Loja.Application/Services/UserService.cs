@@ -298,7 +298,11 @@ namespace Loja.Application.Services
                 userDto.EstabelecimentoNome = estabelecimento.Nome;
 
                 await _userManager.AddToRoleAsync(userDB, userDto.Role);
-            }                
+            }   
+            else if(result.Errors.Any(x => x.Code == "PasswordTooShort"))
+                return ResultDto<UserDto>.Validation("senha deve ter no minimo 6 caracteres!");
+            else
+                return ResultDto<UserDto>.Validation("Cadastro inválido!");
 
             return await Task.FromResult(ResultDto<UserDto>.Success(userDto));
         }
@@ -369,6 +373,8 @@ namespace Loja.Application.Services
 
             if (!result.Succeeded)
                 return ResultDto<bool>.Validation("Erro ao alterar senha!");
+            else if (result.Errors.Any(x => x.Code == "InvalidToken"))
+                return ResultDto<bool>.Validation("Token Invalido!");
 
             return await Task.FromResult(ResultDto<bool>.Success(true));
         }
